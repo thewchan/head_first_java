@@ -1,0 +1,61 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 3 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{Variable Types}
+    Variables are containers that hold or reference to data. Variables in Java must be declared along with a type. There are two main categories of types:
+
+    \begin{itemize}
+        \item Primitive --- these hold fundamental (simple bit patterns) values:
+        \begin{itemize}
+            \item \texttt{boolean} --- true or false
+            \item \texttt{char} --- a single character. E.g. `a', `T', `3', `@'.
+            \item Numerics/Integers --- these are positive or negative whole numbers and can be various in size and must be declared thusly:
+            \begin{itemize}
+                \item \texttt{byte} --- values from -128 to 127
+                \item \texttt{short} --- values from -32768 to 32767
+                \item \texttt{int} --- values from -2147483648 to 2147483647
+                \item \texttt{long} --- values with VERY large magnitudes
+            \end{itemize}
+            \item Floating points --- these are essentially decimals/fractions, two different size:
+            \begin{itemize}
+                \item \texttt{float} --- 32 bits in memory
+                \item \texttt{double} --- 64 bits in memory
+            \end{itemize}
+        \item Declare primitive variables by: \texttt{int x = 4;}, \texttt{char atSign = `@';}, or without assigning values: \texttt{double y;}, \texttt{boolean isTom;}
+        \end{itemize}
+        \item Object Reference --- these reference to objects, few things of note:
+        \begin{itemize}
+             \item They \textbf{DO NOT} hold actual objects, but rather memory address to an object.
+             \item The dot operator (\texttt{.}) allows access to instance variables and methods within an object the variable is referencing: \texttt{object.variable}, \texttt{object.method()}
+             \item Declare object reference variables by: \texttt{className objectName = new className();}
+         \end{itemize} 
+    \end{itemize}
+
+    An array is a ``list'' or variables. The individual element of the array can be any kind of variables (primitive or object reference). For example, to declare an \texttt{int} array of length 7:
+
+    \begin{lstlisting}
+int[] nums;
+nums = new int[7];
+nums[0] = 6;
+nums[1] = 19;
+    \end{lstlisting}
+
+    Like python lists; arrays are ordered, 0-indexed, and mutable. In Java, arrays are also objects and behave like any other objects, no matter if they contain primitives or object references. An object reference array can be declared as:
+    
+    \begin{lstlisting}
+className[] names;
+names = new className[7];
+names[0] = new className();
+names[1] = new className();
+    \end{lstlisting}
+
+\end{document}

@@ -1,0 +1,25 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 13 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}, breaklines=false}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{Layout Managers in GUI}
+    It is possible to hard-code the positions of widgets and components onto a GUI window, but that can be unwieldy. Layout managers offer dynamic positioning and flexible positioning rules depending on what is desired. There are three main layout managers available in \texttt{Swing}:
+
+    \begin{enumerate}
+        \item \texttt{BorderLayout} --- This layout can at most hold five components, one at each region: \texttt{NORTH, SOUTH, EAST, WEST, CENTER}. This is the default layout manager for a frame in \texttt{Swing}.
+        \item \texttt{FlowLayout} --- This layout tries to fit as many components as possible, going from left-to-right, top-to-bottom. This is the default layout manager for a panel in \texttt{Swing}.
+        \item \texttt{BoxLayout} --- This layout is similar to \texttt{FlowLayout}, except it ``stacks'' the components either horizontally or vertically.
+    \end{enumerate}
+
+    Components can be nested. Therefore, by nesting different components on the frame, almost any desired overall layout of the components can be achieved.
+
+\end{document}

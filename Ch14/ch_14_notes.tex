@@ -1,0 +1,79 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 14 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}, breaklines=false}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{Serialization}
+    Serialization is a process that ``\emph{flattens}'' a Java object such that its states is saved into a file that can be revived later on. This is useful for passing objects between different Java programs. There are four steps to the serialization of a Java object into a file:
+
+    \begin{enumerate}
+        \item Instantiate a \texttt{FileOutputStream} object --- The \texttt{FileOutputStream} class object in Java is the object with the method to create files from a serialized object. There is a variety of ways to instantiate a \texttt{FileOutputStream}, but commonly the constructor takes a \texttt{String} argument of the file name where the object is to be saved as.
+        \item Instantiate a \texttt{ObjectOutputStream} object --- The \texttt{ObjectOutputStream} class object serialize the objects to be saved into a file. When instantiating an \texttt{ObjectOutputStream} the constructor takes arguments that depends on the final destination of the serialized object. In this case because the object is to be saved into a file, the \texttt{ObjecttOutputStream} will need to be \emph{chained} to a \texttt{FileOutputStream}, which would be the argument for the constructor.
+        \item Writing the object to the \texttt{ObjectOutputStream} --- The object to be serialized is written to the \texttt{ObjectOutputStream} by calling its \texttt{writeObject()} method. Multiple objects can be written to an \texttt{ObjectOutputStream}, and the order matters, and when the objects are read back out of the file it will be read in the order they were written in.
+        \item Close the \texttt{ObjectOutputStream} --- By calling the \texttt{close()} method of the \texttt{ObjectOutputStream}, the entire stream chain is closed (in this case, the \texttt{FileOutputStream} as well).
+    \end{enumerate}
+
+    Serializing and saving a specific object to a file means that the object's \emph{state} is saved, and can be revived later and/or elsewhere. The state of an object are its instant variables, which can be primitives or object references. In the case of primitive instance variables, the values of the primitives (\textit{e.g.} \texttt{int 24}, \texttt{double 874.0045}) are written into the serialization. For object reference instance variables, however, the objects the variables are also serialize, and if those objects has object reference instance variables, objected being referenced by those variables are also serialize, and so forth, until the entire object graph is written into the serialization. 
+
+    In order to utilize serialization, the \texttt{Java.io.*;} package needs to be imported, and each object class to be serialize must implement the \texttt{Serializable} interface. Note that if an instance variable of the object to be serialize references a object where its class did not implement \texttt{Serializable}, the serialization will fail. In other words, all object classes in the object graph of the object to be serialized must all implement \texttt{Serializable} for the serialization to be successful. It is possible to exclude instance variables of an object class from being serialized by declaring them to be \texttt{transient}. Instance variables declared \texttt{transient} will be ignored during serialization. This can be used to prevent serialization exceptions as described above. During deserialization, ignored \texttt{transient} instant variables (which now have no values because they were not serialized at the first place) will default to a value of \texttt{null}. 
+
+    Deserialization in Java takes five steps, which is essentially the reverse of serialization:
+
+    \begin{enumerate}
+         \item Instantiate a \texttt{FileInputStream} object --- Just like its writing counterpart, a \texttt{FileInputStream} object is able to read bytes from a file into serialization that can be deserialized. The constructor can take various arguments, such as a file name.
+         \item Instantiate a \texttt{ObjectInputStream} object --- Again, like its writing counterpart, the \texttt{ObjectInputStream} object deserialize the serialization back to an object by calling its methods. It cannot read files directly so it must be chained to a \texttt{FileInputStream} or other objects that is able to read whatever form the serialized object currently takes.
+         \item Reading the object from \texttt{ObjectInputStream} --- By calling the \texttt{readObject()} method of a \texttt{ObjectInputStream} object, the serialization will be deserialized back into an object. Note that despite what class the original object belongs to, the deserialized object now will be of class \texttt{Object}.
+         \item Casting the deserialized object --- Because objects deserializes into \texttt{Object} class, they must be cast back to their original class.
+         \item Close the \texttt{ObjectInputStream} --- By calling the \texttt{close()} method of the \texttt{ObjectInputStream}, the entire stream chain is closed (in this case, the \texttt{FileInputStream} as well).
+    \end{enumerate} 
+
+    Deserialization is handled by the JVM, and although the object is deserialized into class \texttt{Object}, the JVM will need to have access to the original (not a polymorph of) class of the object. This applies to all object class within the serialized object's object graph. Note that the process of deserialization does not run the object's constructor, as that would reinitialize all instance variable values. Another note is that \texttt{static} instance variables are not serialized in the way other instance are, as the value of a \texttt{static} variable is associated with the \emph{class} itself, and not an instance of the class. Here is an example of a generic serialization-deserialization code block:
+
+    \begin{lstlisting}
+import java.io.*;
+
+// Class and method declaration here.
+
+    FileOutputStream fos = new FileOutputStream(``object.ser'');
+    ObjectOutputStream oos = new ObjectOutputStream(fos);
+    oos.writeObject(one);
+    oos.writeObject(two);
+    oos.writeObject(three);
+    oos.close()
+
+    // Other code here.
+
+    FileInputStream fis = new FileInputStream(``object.ser'');
+    ObjectInputStream ois = new ObjectInputStream(fis);
+    Object newOne = ois.readObject();
+    Object newTwo = ois.readObject();
+    Object newThree = ois.readObject();
+    ActualClass realNewOne = (ActualClass) newOne;
+    ActualClass realNewTwo = (ActualClass) newTwo;
+    ActualClass realNewThree = (ActualClass) newThree;
+    ois.close();
+    \end{lstlisting}
+
+    The above code block is verbose for clarity, but several of the code lines are often combined into as single line in practice (for example, the reading of the object from the \texttt{ObjectInputStream} and casting can be combined.) Also, most methods/constructors used in serialization/deserialization throw exceptions (usually \texttt{IOException} and its subclasses), so related code needs to be wrapped in a \texttt{try-catch} block.
+
+    Because serialized objects are often used in a later date, version control is essential. The class of the serialized objects could have changed in between serialization and deserialization (these changes can include, for example: deleting instance variables; changing the type of instance variables; changing whether or not instance variables are \texttt{transient}/\texttt{static}; moving the class up or down the inheritance tree, etc.) To prevent class version conflicts, \texttt{serialVersionUID}, which is a unique identifier of a class based on, among other things, the identity of the class, and version of JAVA/JVM, and so on, is used as a fingerprint of sorts. During deserialization, the JVM checks the \texttt{serialVersionUID} of the class the JVM has access to, and the class in the serialization. If the \texttt{serialVersionUIDs} are different, the deserialization will fail. This can be circumvented by finding out the \texttt{serialVersionUID} of the class the JVM currently has access to by using the JDK command line tool \texttt{serialver} (which takes the name of the class of interest as an argument), which will return a \texttt{serialVersionUID} variable declaration (such as: \texttt{private static final long serialVersionUID = -6042309455930068204L}). This can be used to manually set the \texttt{serialVersionUID} of a class even after a user has changed it, so that the JVM would recognize that the modified class has the same \texttt{serialVersionUID} as the class it has access to, and go ahead with the deserialization despite the two classes really did changed. Note that if there still actually are conflicts between the original class and modified class, deserialization will still fail; manually setting the \texttt{serialVersionUID} merely gives the user an opportunity to account for differences between the original class and modified class and had came up with code to compensate for that (\textit{e.g.} adding default values for new instance variables added to the class after it was serialized.)
+
+    \section*{Writing and Reading Text Files}
+
+    If objects need to be saved and later be used by \emph{non-Java} programs, then serialization will not suffice. In this case, one way to accomplished this is to write the data into a text file. Writing text files require not a \texttt{FileOutputStream} but a \texttt{FileWriter} object, also available in \texttt{java.io.*}. The process is similar except no object stream step is needed. Reading from a text file require similar processes, in this case a \texttt{FileReader} object is used instead, by calling methods such as \texttt{readLine()}, which reads an entire line of text from the file (in order), which can then be assigned to a \texttt{String} variable or other objects.
+
+    \section*{The \texttt{File} Class}
+    The Java class \texttt{File} is an object representation of a file (or more accurately, a location on disk), similar to a file handle in Python. The object to not have any internal values representing the content of the file, but only provide access to it. The \texttt{File} class comes with many methods similar to functions of the Python \texttt{os} package, such as making a new directory (\texttt{mkdir()}), listing contents of a directory (\texttt{list()}), Boolean check if \texttt{File} object is a directory (\texttt{isDirectory()}), return absolute path of the \texttt{File} object location on disk (\texttt{getAbsolutePath()}), and deleting the file/location referred to by the \texttt{File} object (\texttt{delete()}). \texttt{File} objects can be passed to other stream-related objects such as \texttt{FileInputStream} and \texttt{FileOutputStream} rather than a \texttt{String} file name. This is a good practice that provides more security and better exception handling. 
+
+    \section*{Buffers}
+    A buffer in Java is a temporary holding place to group items together until the buffer is full. There are many types of buffer in Java; one example would be \texttt{BufferedWriter}, which temporarily stores \texttt{Strings} that was read/will be written later. For writing text files, using a \texttt{BufferedWriter} significantly increases efficiency both in code and also in memory usage. To send the buffered content of a buffer to the next chained stream before the buffer is full, as it is often the case, the \texttt{flush()} method can be called. A \texttt{BufferedReader} is the analogous object that is more efficient at reading text files (by using the \texttt{readLine()} method, for example.)
+
+\end{document}

@@ -1,0 +1,116 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 7 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}, breaklines=true}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{Superclass, Subclass, and Inheritance}
+    For efficient object-oriented programming, a more abstract \emph{superclass} can be defined first with its own instance variables and methods, and various \emph{subclasses} can be defined such that that it \emph{inherits} all the instance variables and methods from the superclass. Each subclass can be further extended beyond the instanace variables and methods they inherited, even \emph{overriding} the methods of the superclass. Note that there can be multiple levels of inheritance. A subclass can be a superclass that has subclasses of its own. It is important not to abuse inheritance by applying the IS-A and HAS-A tests:
+
+    \begin{enumerate}
+        \item IS-A Test --- This test can be used to verify valid inheritance relationships. For example: class Triangle inherits from class Shape, this is valid because a triangle IS-A Shape. Other examples: Cat IS-A Feline; Surgeon IS-A Doctor. 
+        \item HAS-A Test --- Sometimes certain class relationships can seem like inheritance but it deceptively is not. For example, if class Tub extends from class Bathroom, this would NOT be a valid inheritance relationship, as a Tub is NOT a Bathroom. Rather, a Bathroom HAS-A Tub, which implies that in terms of Java code, Tub should be an instance variable of Bathroom, NOT a subclass.
+    \end{enumerate}
+
+    The above two tests works over multiple layers of inheritance. Note that inheritance is directional; that is, a class Triangle IS-A class Shape, but a class Shape is NOT a Triangle. This directional implication means that a Triangle can do everything a Shape can do (factoring any overriding methods), but a Shape cannot necessarily (most likely not) do everything a Triangle can.
+
+    In cases where a user want to use a method of a subclass but also the same method of its superclass, this is possible:
+
+    \begin{lstlisting}
+public class Animal {
+    void roam() {
+    System.Out.print(``Animal roaming'');
+    }
+}
+
+//
+
+public class Cat extends Animal {
+    void roam() {
+    super.roam();
+    System.Out.print(``Cat roaming'');
+    }    
+}
+    \end{lstlisting}
+
+    Here, \texttt{Cat} is a subclass of \texttt{Animal}, to define it's own \texttt{roam();} method it is possible to extend the original \texttt{roam();} method from \texttt{Animal} without completely replacing it by using \texttt{super.roam();} as above.
+
+    \section*{Inheritance Access Levels}
+    It is possible to limit class members (instance variables and methods, among other things) inheritance by flagging their access levels:
+
+    \begin{enumerate}
+        \item Public --- These instance variables and methods are inherited by subclasses.
+        \item Private --- These instance variables and methods are NOT inherited by subclasses.
+        \item Final --- Methods flagged as final cannot be overridden.
+        \item Default --- Related to deployment.
+        \item Protected --- Related to deployment.
+    \end{enumerate}
+
+    Classes themselves cannot be flagged as \texttt{private} \textit{per se}, but if it is not flagged as \texttt{public} it can only be inherited by other classes in the same package. Additionally, a class flagged \texttt{final} cannot be inherited. 
+
+    \section*{Polymorphism}
+    Polymorphism is a mechanism that allows for great flexibility in coding with regards to types due to object inheritance. For example, given that \texttt{Dog} is a subclass of \texttt{Animal}:
+
+    \begin{lstlisting}
+Dog myDog = new Dog();
+Animal myDog2 = new Dog();
+    \end{lstlisting}
+
+    Both lines of code above would be valid due to polymorphism. The implication here is that an array or an \texttt{ArrayList} can contain objects of different subclasses providing that they all have the same supers. For example:
+
+    \begin{lstlisting}
+Animal[] animals = new Animal[5];
+animals[0] = new Dog();
+animals[1] = new Cat();
+animals[2] = new Wolf();
+animals[3] = new Hippo();
+animals[4] = new Lion();
+    \end{lstlisting}
+
+    The above listing would be valid if \texttt{Dog, Cat, Wolf, Hippo}, and \texttt{Lion} are all subclasses of \texttt{Animal}. Looping (e.g., with a \emph(for) loop) across the array (or ArrayList) above, even though it technically contains elements that are of different object class, would be valid. Furthermore, this has the same implication with method arguments and return types:
+
+    \begin{lstlisting}
+class Vet {
+    public void giveShot(Animal a) {
+    a.makeNoise();
+    }
+}
+
+class PetOwner {
+    public void start() {
+    Vet v = new Vet();
+    Animal d = new Dog();
+    Hippo h = new Hippo();
+    v.giveShot(d);
+    v.giveShot(h):
+    }
+}
+    \end{lstlisting}
+
+    In the above listing, the \texttt{Vet} class has a method \texttt{giveShot();} that takes an \texttt{Animal} argument. As shown here, passing a \texttt{Dog} or a \texttt{Hippo} are both valid because they are both subclasses of \texttt{Animal} due to polymorphism. 
+
+    \section*{Overriding and Overloading}
+    It is possible for a subclass to modify a method it inherited from its superclass, this is a mechanism called \emph{overriding}. Requirements for overriding methods:
+
+    \begin{enumerate}
+        \item Naturally, the overriding method must be named the same as the inherited method.
+        \item The overriding method must accept the exact same argument(s) as the inherited method it is overriding.
+        \item If the inherited method returns anything, the overriding method must declare the same return type or one of its subclass.
+        \item An overriding method cannot have less accessibility than the inherited method. For example, if the inherited method was declared as a \texttt{public} method, the overriding method cannot be declared \texttt{private}.
+    \end{enumerate}
+
+    It is possible to declare a method with the same name as an inherited method from a superclass that does not fulfill one or more of the above requirement. However, the resulting method will \emph{not} have overridden the superclass method, as it actually only created a new method that coexists with the inherited superclass method, even though they would have the same name. This is refer to as \emph{overloading}, and no polymorphism took place. There are some nuances to overloading a method:
+
+    \begin{enumerate}
+        \item As above, the name of the method in the subclass and the superclass must be the same.
+        \item The argument(s) of the subclass \emph{must} be different from the inherited superclass method, otherwise the compiler will assume that the subclass method is trying to override the superclass method, and an exception might occur.
+        \item The return type of the subclass method do not have to be the same as the inherited superclass method.
+        \item The accessibility of subclass method and the superclass method do not have to be the same; they can increase or decrease in accessibility (\texttt{public} to \texttt{private} or \textit{vice versa}).
+    \end{enumerate}
+\end{document}

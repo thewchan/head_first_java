@@ -1,0 +1,26 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 6 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}, breaklines=true}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{The ArrayList Pre-Built Class}
+    The \texttt{ArrayList} class in Java is a built-in class that offers an enhanced array-object that has functionality similar to lists and other collections in Python. The \texttt{ArrayList} class differs from regular Java arrays by:
+
+    \begin{itemize}
+        \item The size of the \texttt{ArrayList} object is mutable, it does not need to be specified during declaration. Whereas for a regular array the size must be specified when declared. E.g. \texttt{new String[2];}
+        \item When adding objects into an \texttt{ArrayList}, specifying an index is optional: \texttt{myArrayList.add(object);} is valid as is \texttt{myArrayList.add(0, object);} In an regular array the index must be specified.
+        \item It is possible to remove elements in an \texttt{ArrayList} via the \texttt{myArrayList.remove();} method. The size of the \texttt{ArrayList} will adjust to the updated size. This is not possible with regular arrays; the most one can do is to set an element to \texttt{null}.
+        \item While the type on a regular array needs to be specified during declaration, this is done differently with \texttt{ArrayList}. The element type of the \texttt{ArrayList} should be \emph{parameterized} during declaration. For example, to declare an \texttt{ArrayList} with \texttt{String} elements: \texttt{ArrayList<String> myArrayList = new ArrayList<String>;}
+        \item The square bracket syntax for regular arrays (e.g. \texttt{myArray[0]}) is not used in \texttt{Arraylist}. To access specific element by index in an \texttt{ArrayList} use the \texttt{myArrayList.get();} method.
+    \end{itemize}
+
+    To use \texttt{ArrayList} in Java, it must be imported via \texttt{import java.util.ArrayList}.
+    
+\end{document}

@@ -1,0 +1,160 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 16 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}, breaklines=false}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{Generics}
+    Generics in Java is a mechanism that increases type-safety and is often used in collection-related classes due to polymorphism. In Java, most collection classes like \texttt{ArrayList} requires consistency in the type of object it will contain as well as the type of object argument its methods will pass. This consistency requirements can be seen in the Java API documentation of various collection classes. For example, the class declaration for ArrayList reads:
+
+    \begin{lstlisting}
+public class ArrayList<E>
+extends AbstractList<E>
+implements List<E>, RandomAccess, Cloneable, Serializable
+    \end{lstlisting}
+
+    The notation \texttt{<E>} heres denotes a generic type (where E stands for ``element'') that can be pretty much any objects (\texttt{String}, \texttt{Integer}, even \texttt{Object}), but whatever E is must be consistent within the declared object. This becomes clear when looking at associated constructors and methods for \texttt{ArrayList<E>}:
+
+    \begin{lstlisting}
+get()
+public E get(int index)
+
+add()
+public boolean add(E e)
+    \end{lstlisting}
+
+    Both the methods \texttt{ArrayList.get()} and \texttt{ArrayList.add()} requires an argument of class E object, which is whatever E was during the declaration of the \texttt{ArrayList} itself. This means that \texttt{ArrayList<String>} can only accept elements of class \texttt{String}, and not, for example, of class \texttt{Integer}. Polymorphism applies here, so E can be anything that passes the IS-A test. For example, if an \texttt{ArrayList<Animal>} was declared, where \texttt{E = Animal}, then when calling \texttt{ArrayList<Animal>.add()} a argument of object class \texttt{Animal} can be passed, so does a \texttt{Dog} class object (a subclass of \texttt{Animal}, so \texttt{Dog} IS-A(N) \texttt{Animal}) as well as a \texttt{Cat} class object (same as \texttt{Dog}; a subclass of \texttt{Animal}). However, if \texttt{ArrayList<Dog>} was declared, then \texttt{ArrayList<Dog>.add()} cannot accept a \texttt{Cat} object as argument, because \texttt{E = Dog} and a \texttt{Cat} fails the IS-A test for \texttt{Dog}.
+
+    Note that when writing class and their related methods and using generics, by convention \texttt{E} is only use to denote generics for collection classes (as \texttt{E} stands for element), for all other cases it is generally accepted that \texttt{T} should be used instead. When declaring methods with generics, a special parameterization can be declared:
+
+    \begin{lstlisting}
+public <T extends Animal> void takeThing(ArrayList<T> list)
+    \end{lstlisting}
+
+    To parameterize a method the generic should be declared just before the return type. Here \texttt{<T extends Animal>} means \texttt{T} = any class that extends the class \texttt{Animal} (including \texttt{Animal} itself). Note that in order to utilize the polymorphism aspect of generics the above syntax must be used. If the parameterization wasn't declared:
+
+    \begin{lstlisting}
+public void takeThing(ArrayList<Animal> list)
+    \end{lstlisting}
+
+    In this case, the compiler will not allow the code to compile if the argument passed to \texttt{takeThing()} is not exactly an \texttt{ArrayList<Animal>}. Polymorphism is disabled in this case to prevent type confusion down the road.
+
+    Type parameterization during method declaration can accommodate greater degree of complexity. For example in the \texttt{sort()} static method available in the \texttt{Collections} package:
+
+    \begin{lstlisting}
+public static <T extends Comparable<? super T>> void sort(List<T> list)
+    \end{lstlisting}
+
+    There the generic type \texttt{T} is defined as any class that extends (or in this context, implements) the \texttt{Comparable} interface. The \texttt{?} notation used here is a Java ``wild card'' character, similar to \texttt{E} and \texttt{T}, except there is no consistency expectation (that is, whatever \texttt{?} is does not have any relation to another \texttt{?} within the same declaration statement.) Here, \texttt{Comparable<? super T>} means that the \texttt{Comparable} interface must be parameterized to ether \texttt{T} or one of \texttt{T}'s superclass. The wild card character can be used interchangeably with the \texttt{T}/\texttt{E} syntax:
+
+    \begin{lstlisting}
+public <T extends Animal> void takeThing(ArrayList<T> one, ArrayList<T> two)
+
+public void takeThing(ArrayList<? extends Animal> one, ArrayList<? extends Animal> two)
+    \end{lstlisting}
+
+    The two different declaration above are functionally the same. However, using \texttt{T} is less verbose. 
+
+    \section*{Collections}
+
+    The Java \texttt{Collections} API has many useful classes that give various functionality similar to \texttt{ArrayList}. 
+
+    \begin{itemize}
+        \item \texttt{TreeSet} --- The \texttt{TreeSet} class limits the elements it can contain to only unique elements, and can only keep them in sorted order. The ordering occurs automatically and there is no way to change it. Also, elements added into a \texttt{TreeSet} must be a from a class that implemented \texttt{Comparable} somewhere in its inheritance tree.
+        \item \texttt{HashMap} --- This is similar to Python dictionaries with keys and values. Because of that, the parameterization of \texttt{HashMap} takes two elements in its angle brackets, for example \texttt{HashMap<String, Integer>}.
+        \item \texttt{LinkedList} --- Functionally almost the same as \texttt{ArrayList}, but difference in internal structure means \texttt{LinkedList} is faster for manipulation but slower for random access.
+        \item \texttt{HashSet} --- This is similar to Python sets in that it only contains unique elements. However, \emph{unique} has very specific meaning in Java that might cause seemingly unpredictable behavior. Also, there is ordering in a Java \texttt{HashSet} unlike a Python set.
+        \item \texttt{LinkedHashMap} --- List a \texttt{HashMap} but with ordering.
+    \end{itemize}
+
+    \section*{\texttt{Comparable} and \texttt{Comparator}}
+    Collection class objects can utilize its methods to manipulate its elements, for example sorting using the static method \texttt{Collection.sort()}. However, many of these methods require the elements are from a class that is either \texttt{Comparable} (by extending/implementing the \texttt{Comparable} interface) or that the method call is passed a \texttt{Comparator} class object instead. The interface \texttt{Comparable} has an abstract method that must be declared by any class that implements the interface: \texttt{compareTo()}, which accepts the argument \texttt{T} which is parameter is must specified during class declaration (\textit{e.g.}, public class Animal implements Comparable<Animal>). Often times while overriding the \texttt{compareTo()} method it isn't necessary to write the code from scratch, as the instance variable the user desired to be used as the reference for comparison usually comes from a class that had already implemented \texttt{Comparable} (classes such as \texttt{String}, \texttt{Integer}, etc.) Therefore when overriding in the new class all that is needed to is to call \texttt{compareTo()} from that variable. For example:
+
+    \begin{lstlisting}
+class Song implements Comparable<Song> {
+    
+    String title;
+
+    Song(String t) {
+        title = t;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public int compareTo(Song s) {
+        return title.compareTo(s.getTitle());
+    }
+}
+    \end{lstlisting}
+
+    An alternative way is to use a \texttt{Comparator} as an argument for these methods. In this example for the \texttt{Collections.sort()} method it is overloaded with two different sets of arguments, either a \texttt{List<T>} (\texttt{List} has many subclasses, such as \texttt{ArrayList} etc., which would all be acceptable because an \texttt{ArrayList} IS-A \texttt{List}) or a \texttt{List<T>} and a \texttt{Comparator<? super T>}. This difference here is for the one-argument version of the method call (the case described above), \texttt{T} is parameterized to \texttt{<T extends Comparable<? super T>>}, while the two-argument version \texttt{T} is not parameterized and can be any object.
+
+    To use the two-argument method call then an object that implemented \texttt{Comparator} as an interface must be declared (but note that in this case \texttt{T} does not need to implement \texttt{Comparable}). The \texttt{Comparable} interface has two abstract methods that needs to be implemented, \texttt{compare()} and \texttt{equals()}, but \texttt{equals()} is a special case in Java where it is not necessary for it to be implemented. The method \texttt{compare()} takes two argument of the desired object, and similar to \texttt{compareTo()} above it is often not necessary to rewrite the code body of the method (for the same reason as above):
+
+    \begin{lstlisting}
+class Song {
+    
+    String title;
+
+    Song(String t) {
+        title = t;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+}
+
+class TitleCompare implements Comparator<Song> {
+    
+    public int compare(Song one, Song two) {
+        return one.getTitle().compareTo(two.getTitle());
+    }
+}
+    \end{lstlisting}
+
+    In this case, a new instance of the \texttt{TitleCompare} class would be created and pass with \texttt{Collections.sort()} along with the \texttt{List<T>} (\texttt{T} would be \texttt{Song} in this case) argument.
+
+    \section*{Duplicates and Unique Objects in Java}
+    Unlike in Python, whether or not objects are duplicates or unique from one another might not be self-evident. This is because Java treats \emph{reference equality} and \emph{object equality} as not trivial. Two objects can have the same values (that is, the same instant variable values), and exist are two different object on the heap. In this case, this is referred to as \emph{object equality}, where it is meaningfully equal to each other, yet Java treats them as unique from each other. Internally, Java keeps track of object identify via \emph{hash codes} when putting them in the hash-based collections (\textit{e.g.} \texttt{hashMap}, \texttt{hashSet}), and unique objects are determined by having different hash codes. This means that objects that has \emph{reference equality} must have the same hash codes (note that having the same hash code does not guarantee reference equality.) This can lead to unintentional behavior when dealing with collections. If a user desired that a collection only contains ``unique'' objects, they can put them into a hash-based collection such as a \texttt{hashSet}. However, more often than not the user actually desires that the \texttt{hashSet} only contain objects that are unique in the object equality sense (that is, objects with the same instance variable values be treated as duplicates even those they might be different objects on the heap with different hash codes.) In this case the \texttt{hashCode()} and \texttt{equals()} methods must be overridden in the class at hand. For example:
+
+    \begin{lstlisting}
+class Song implements Comparable<Song> {
+    
+    String title;
+
+    Song(String t) {
+        title = t;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public int compareTo(Song s) {
+        return title.compareTo(s.getTitle());
+    }
+
+    public boolean equals(Object aSong) {
+        Song s = (Song) aSong;
+        return getTitle().equals(s.getTitle());
+    }
+
+    public int hashCode() {
+        return title.hashCode();
+    }
+}
+    \end{lstlisting}
+
+    With regards to the \texttt{equals()} method, overriding this is a similar process as the \texttt{compare()} override above as most classes already has its own \texttt{equals()} method. The \texttt{equals()} override here should return the \texttt{equals()} return value of whatever the user desired the uniqueness should be based upon (in this case, the song title.) This is the same with the \texttt{hashCode()} override, where instead of returning the hashCode of the entire object, \texttt{hashCode()} should return the hash code of the \texttt{String title}, so that \texttt{Song} objects with the same \texttt{title} value will generate the same hash code. 
+
+\end{document}

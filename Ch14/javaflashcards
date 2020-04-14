@@ -1,0 +1,70 @@
+Application Program Interface (API)/Also known as a library, contains predefined classes and interfaces for developing Java programs
+Assembler/A program to convert assembly language into machine language
+Assembly Language/Low-Level language created to ease the code writing.
+Bit/A unit of measurement of information, 0 & 1 create digits known as binary number system.
+Block/Curly braces {}, every class has class blocking that groups the data and methods of the class.
+Block Comment/(//) Creates a block comment, computer will read the first (//) and ignore all text until the final (//). Use (/*) and (*/) for multiple line instructions or comments.
+Bus/Subsystem of computer components that power and data flow through.
+Byte/A sequence of 8 bits (enough to represent one character of alphanumeric data) processed as a single unit of information.
+Bytecode/Is similar to machine instructions but is architecture neutral and can run on any platform that has a JVM.
+Bytecode Verifier/Checks the validity of the Bytecode and to ensure that the Bytecode does not violate Java's security restrictions.
+Cable Modem/Uses the cable TV line maintained by the cable company and is generally faster than DSL.
+Central Processing Unit (CPU)/A microprocessor chip; the part of a computer that does most of the data processing. Contains two parts: Control unit and Arithmetic/Logic Unit.
+Class Loader/Part of the Java Runtime Environment that dynamically loads Java classes into the Java Virtual Machine. Usually classes are only loaded on demand. The Java runtime system does not need to know about files and file system because of class loaders.
+Comment/Help programmers to communicate and understand the program. (//) Single line comment; (/* */) multiple line comment.
+Compiler/A computer program (or a set of programs) that transforms source code written in a programming language into another computer language (the target language, often having a binary form known as object code). The most common reason for wanting to transform source code is to create an executable program.
+Console/The text entry and display device of the comput; archiac terminology.
+Dot Pitch/The amount of space between pixels, measured in millimeters. The smaller the dot pitch the sharper the display.
+Digital Subscriber Line (DSL)/A family of technologies that provide internet access by transmitting digital data over the wires of a local telephone network.
+Encoding Scheme/A set of rules that govern how a computer translates characters, numbers, and symbols into data the computer can actually work with.
+Hardware/The visible physical elements of a computer.
+High-Level Language/A programming language with strong abstraction from the details of the computer. In comparison to low-level programming languages, it may use natural language elements, beeasier to use, or may automate (or even hide entirely) significant areas of computer systems (e.g. memory management), making the process of developing a program simpler and more understandable relative to a lower-level programming language.
+Integrated Development Environment (IDE)/A software application that provides comprehensive facilities to computer programmers for software development. An IDE normally consists of a source code editor, build automation tools, and a debugger.
+Interpreter/Changes the source code into machine code for execution.
+Java Language Specification/A technical definition of the Java programming language's syntax and semantics.
+Java Virtual Machine (JVM)/A virtual machine that can execute Java bytecode. It is the code execution component of the Java platform.
+Keyword (Reserved Word)/These have specific meanings to the compiler and cannot be used for other purposes in the program.
+Library/Contains predefined classes and interfaces for developing Java programs.
+Line Comment/// is used by programmers to relay information about coding in the program.
+Java Development Toolkit (JDK)/The software for developing and running Java programs.
+Array/A collection of fixed number of components wherein all of the components have the same data type.
+Index/Any expression whose value is a non-negative integer.
+Base Address/The address, or memory location, of the first array component.
+How are the components arranged in a one-dimensional array?/In a list form.
+The array index always starts at.../0.
+True or false: A method can return a value of the type array./True.
+Algorithm/A step-by-step procedure for calculations. Algorithms are used for calculation, data processing, and automated reasoning.
+Assignment Operator (=)/The operator used for assignment; like most other operators in Java, it can be overloaded.
+Assignment Statement/Sets and/or re-sets the value stored in the storage location(s) denoted by a variable name. In other words, it copies the value into the variable. In most imperative programming languages, the assignment statement (or expression) is a fundamental construct.
+Byte Type/Holds unsigned 8-bit (1-byte) integers that range in value from 0 through 255.
+Casting/An operation that converts a value of one data type into a value of another data type.
+Char Type/Used to represent a single character.
+Constant/An identifier whose associated value cannot typically be altered by the program during its execution (though in some cases this can be circumvented, e.g. using self-modifying code.) Many programming languages make an explicit syntactic distinction between constant and variable symbols.
+Data Type/A classification identifying one of various types of data, such as real-values, integer, or Boolean, that determines the possible values for that type; the operations that can be done on values of that type; the meaning of the data; and the way values of that type can be stored.
+Declare Variables/Discriptive names referring to stored data for any variable.
+Decrement Operator (--)/Unary operator that subtract one from their operand.
+Double Type/A floating point data type that is often more precise than double precision. 
+Encoding/Translation between formal languages. For programmers, the most familiar form of encoding is the compilation of a programming language into machine code or byte-code. Conversion between document formats are also forms of encoding. Compilation of TeX or LaTeX documents to PostScript are also commonly encountered encoding processes. some high-level preprocessors such as OCaml's Camlp4 or Apple Computer's WorldScript also involve encoding of a programming language into another.
+Escape Character/A character which invokes an alternative interpretation on subsequent characters in a character sequence. An escape character is a particular case of meta-characters. Generally, the judgement of whether something is escape character or not depends on context.
+Expression/A programming language is a combination of explicit values, constants, variables, operators, and functions that are interpreted according to the particular rules of precedence and of association for a particular programming language, which computes and then produces (returns, in a stateful environment) another value. This process, like for mathematical expressions, is called evaluation. The value can be of various types, such as numerical, string, and logical.
+Final Keyword/Used in several different contexts to define an entity which cannot later be changed.
+Float Type/Decribes a method of representing an approximation of a real number in a way that can support a wide range of values. The nubmers are, in general, represented approximately to a fixed number of significant digits (the mantissa) and scaled using an exponent. The base for the scaling is normally 2, 10, or 16. The typical number that can be represented exactly is of the form: Significant digits x base^exponent.
+Identifier/Tokens or symbols which name language entities. Some of the kinds of entities an identifier might denote includes variables, types, labels, subroutines, and packages.
+Increment Operator (++)/A unary operators that add one to their operand.
+Incremental Development and Testing/Writing small portions of code (or very simple code) and then testing those incremental developments.
+Int Type/A data type which represents some finite subset of the mathematical integers. Integral data types may be of different sizes and may or may not be allowed to contain negative values. Integers are commonly represented in a computer as a group of binary digits. The size of the grouping varies so the set of integer sizes available varies between different types of computers.
+IPO/Also known as the IPO+S Model, is a functional model and conceptual schema of a general system. An IPO chart/table identifies a program's inputs, it's outputs, and the processing steps required to transform the inputs into the outputs.
+Literal/A notation for representing a fixed value in source code. Almost all programming languages have notations for atomic values such as integers, floating-point numbers, strings, and booleans; some also have notations for elements of enumerated types and compound values such as arrays, records, and objects.
+Long Type/Holds signed 64-bit (8-,byte) integers ,ranging in value from -9,223,372,096,854,775,808 through 9,223,372,096,854,775,807.
+Narrowing (of Types)/Changes a value to a data type that might not be able to hold some of the possible values. For example, a fractional value is rounded when it is converted to an integral type, and a numeric type being converted to Boolean is reduced to either True or False.
+Operands/The object of a mathematical operation; a quantity on which an operation is performed.
+Operator/Operations which differ in the calling of syntax and/or the argument passing mode from the language's functions. Common examples that differ by syntax are mathematical arithmetic operations, e.g. ">" for "greater than", with names often outside the language's set of identifiers for fuctions, and called with a syntax different from the language's syntax for calling functions. Common examples that differ by argument passing mode are boolean operations, e.g. a short-circuiting conjunction that only evaluates later arguments if earlier ones are not false, in a language with strict call-by-value functions.
+Overflow/Occurs when an arithmetic operation attempts to create a numberic value that is too large to be represented within the available storage space. For instance, adding 1 to the largest value that can be represented consititutes and integer overflow. the most common result in these cases is for the least significant representable bits of the result to be stored (the result is said to wrap). On some processor like GPUs and DSPs, the result saturates; that is, once the maximum value is reached, attempts to make it larger simply return the maximum result.
+Primitive Data Type/Either:
+1.) A data type provided by a programming language as a basic building block. Most languages allow more complicated composite types to be recursively constructed starting from basic types.
+Or:
+2.) A data type for which the programming language provides built-in support. 
+In both case, most programming languages implement basic data types as built-in; many languages also provide a set of composite data types.
+Pseudocode/An informal high-level description of the operating principle of a computer program or other algorithm.
+Requirement Specification/A complete description of the behavior of a system to be developed and may include a set of use cases that describe interactions the users will have with the software. It also contains non-functional requirements that impose constraints on the design or implementations.
+Scope of a Variable/Which parts of your program can see or use it. Normally, every variable has a global scope. Once defined, every part of your program can access a variable.

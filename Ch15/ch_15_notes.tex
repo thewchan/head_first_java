@@ -1,0 +1,84 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 15 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}, breaklines=false}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{Network and Connection in Java}
+    In the server-client model of networking, all clients (that is, individual users) that desired to be connected to the same network make a connection to the same \emph{server}. Data and information is not send directly from client to client, it is send from client to server, then server to the desired receiving client. In Java, connections are made between \texttt{Socket} objects, which represents a network connection between two entities (such as a client and a server.) There are many types of \texttt{Socket} objects in Java, in terms of connection made via the Internet, new \texttt{Socket} objects can be instantiated with the destination's Internet Protocol address (IP address) and the Transmission Control Port (TCP) number: \texttt{Socket socket = new Socket(``196.164.1.103'', 5000)}, for example (the \texttt{Socket} constructor can be passed different configurations of arguments.) The IP address represents the ``location'' of the connection destination on the Internet, and the TCP number represents the type of application the connection is for (\textit{e.g.} Email (POP3 or SMTP etc.), websites (HTTP or HTTPS), file transfer (SSH or FTP)). Almost all network operations in Java require importing the \texttt{Java.net.*} package. Reading data from and writing data to the network is similar to serializing data in Java:
+
+    \begin{itemize}
+        \item Reading data from the network:
+        \begin{enumerate}
+            \item Instantiate a \texttt{Socket} object with the IP address and TCP number of the location where the incoming data is coming from.
+            \item Instantiate an \texttt{InputStreamReader} object by passing an \texttt{InputStream} object with the data from the network. An \texttt{InputStream} can be instantiated from the \texttt{Socket} object by calling its \texttt{getInputStream()} method.
+            \item Instantiate a \texttt{Bufferedreader} object by passing its constructor the \texttt{InputStreamReader}. Data then can be read by called the reader's methods, such as \texttt{readLine()} for text.
+        \end{enumerate}
+        \item Writing data to be send to the network:
+        \begin{enumerate}
+            \item Instantiate a \texttt{Socket} object with the IP address and TCP number of the location where the incoming data is coming from.
+            \item Instantiate a \texttt{PrintWriter} object by passing its constructor the \texttt{OutputStreamReader} object from the \texttt{Socket} object by calling its \texttt{getOutputStream()} method.
+            \item Write data by calling methods from the \texttt{PrintWriter} object, such as the \texttt{print()} and \texttt{println()} methods for text.
+        \end{enumerate}
+    \end{itemize}
+
+    The above steps are for client-side connections. To program a server in Java, the process is similar but with some slight modification:
+
+    \begin{enumerate}
+        \item A program acting as a server should instantiate a \texttt{ServerSocket} object instead. The constructor of \texttt{ServerSocket} only needs the TCP number.
+        \item A normal \texttt{Socket} object is then instantiated by passing the \texttt{accept()} method of the \texttt{ServerSocket} (and then assigning it to a object reference variable as usual.) From this \texttt{Socket} reading and writing data is the same as previously described.
+    \end{enumerate}
+
+    \section*{Threading in Java}
+    Like most other programming language, Java can only handle one task at a time, unless multi-threading is utilize. In object-oriented Java, this is implemented with the \texttt{Thread} class object and its methods, available in the standard library. Multi-threading in Java can visualizing as having multiple memory stack, where each has its independent stack of method/constructor frames, with frames the top frame in scope and popping off once the method concludes its task. However, it is important to keep in mind that unless the computer where the multi-threading occurs truly utilizes multiple processor and the JVM accounted for it, then multi-threading is not truly simultaneously operating method frames from multiple stacks (because a single-core CPU in a computer can truly only handle one operation at a time, albeit extremely quickly.) Rather, it switches between the multiple stacks rapidly as the task of the frames are being completed, so that it \emph{appears} that there is true multi-threading. How the stack-switching occurs (how quickly the switches are, which stack goes first, what order, etc.) is completely dependent on the JVM and generally out of control from the user.
+
+    To implement multi-threading in Java:
+
+    \begin{enumerate}
+        \item Any methods from a class that needs to be run on a separate stack from the \emph{main} stack (that is, the stack where the \texttt{main()} method is running on), that class must implement the \texttt{Runnable} interface. The \texttt{Runnable} interface has a \texttt{run()} method that must be overridden if implemented. Essentially, all methods to be ran on this new thread/stack (apart form the \texttt{main()} stack) should be ``bundled'' into this \texttt{Runnable} class object.
+        \item Instantiate a \texttt{Thread} object, with the \texttt{Runnable} object (of whatever class) as argument.
+        \item Call the \texttt{start()} method of the \texttt{Thread} object instance. 
+    \end{enumerate}
+
+    Below is an example execution of this process:
+
+    \begin{lstlisting}
+public class MyRunnable implements Runnable {
+    
+    public void doMore() {
+        System.out.println(``top of the stack'');
+    }
+
+    public void go() {
+        doMore();
+    }
+
+    public void run() {
+        go();
+    }
+}
+
+class ThreadTester {
+    
+    public static void main (String[] args) {
+        Runnable threadJob = new MyRunnable();
+        Thread myThread = new Thread(threadJob);
+
+        myThread.start();
+        System.println(``back in main'')
+    }
+}
+    \end{lstlisting}
+
+    The above code will in effect create two stacks, the \texttt{main()} stack, then the \texttt{myThread.start()} stack. As discussed previously, once the second (the non-\texttt{main()}) stack is created via the \texttt{start()} method, method frames on both stack will run seeming simultaneously. The JVM contains a thread scheduler that is generally not controllable by the user that switches between the threads. While a thread is not in scope (because the JVM thread scheduler decided to run another stack/thread) that thread is said to be at a \emph{runnable} state. The thread scheduler can also move a thread into a \emph{blocked} state, where it is temporarily non-runnable. There are several reasons why the JVM might do this because of conflicting threads (\textit{e.g.} waiting for data to be available) or it was coded to be blocked using the \texttt{sleep()} method. Because the unpredictability of the JVM thread scheduler, tasks operating by different threads may not operate in the intended order. However, some control can be achieved if on each thread \texttt{sleep()} is called for a few millisecond. As a static method, \texttt{sleep()} does not need an instance of \texttt{Thread} object to be called, and will temporarily put a thread to the blocked state for however long the user specified (passed as argument.) This in effect will enable the JVM thread scheduler to pick another thread to be in scope, akin to ``giving a chance'' for the other thread to run. 
+
+    \section*{Concurrency Issues}
+    When utilizing more than two threads in multi-threading, the user may run into concurrency issues. Two separate thread might need access to the same data, but one thread could have modify data without the other anticipating it, and thus causing errors. As such, it is necessary to \emph{lock} certain process until they are completed to prevent confusion. Declaring methods with the \texttt{synchronized} keyword, this modify the method so that only one thread may access it at anytime. Note that if a class contains multiple \texttt{synchronized} methods, all of them as a group can only be accessed by one thread at a time. That is, if class A has \texttt{synchronized} methods \texttt{alpha()} and \texttt{beta()}, if \texttt{alpha()} is being accessed by thread \texttt{one}, it would mean that both \texttt{alpha()} and \texttt{beta()} are inaccessible by other threads until \texttt{one} has completed its task with \texttt{alpha()}. It is important to note that while synchronizing is essential to prevent concurrency issues, abusing synchronization can lead to performance drop and deadlock. Hence, synchronizing methods should only be done at a necessity basis. 
+\end{document}

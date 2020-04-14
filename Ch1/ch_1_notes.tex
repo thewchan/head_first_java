@@ -1,0 +1,87 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 1 Notes}
+
+\begin{document}
+    
+    \maketitle
+
+    \section*{The way Java works:}
+    \begin{enumerate}
+        \item Source code as \texttt{.java} file;
+        \item Compiled using \texttt{javac} to \texttt{.class} file;
+        \item Bytecode files (\texttt{.class}) can be read platform-independently by \emph{Java Virtual Machines (JVM)};
+        \item Application is manifested by \emph{JVM} and perform desired activities.
+    \end{enumerate}
+
+    Here are some sample java code:
+    \begin{center}
+        \begin{tabular}{l p{6cm}}
+            \texttt{int size = 27;} & Declare an integer variable named `\texttt{size}' and give it the value \texttt{27} \\ [1ex]
+            \texttt{String name = ``Fido'';} & Declare a string of characters variable named \texttt{`name'} and give it the value \texttt{``Fido''} \\ [1ex]
+            \texttt{Dog myDog = new Dog(name, size);} & Declare a new \texttt{Dog} variable \texttt{`myDog'} and make the new \texttt{Dog} using \texttt{`name'} and \texttt{'size'} \\ [1ex]
+            \texttt{x = size - 5;} & Subtract \texttt{5} from \texttt{27} (value of \texttt{`size'}) and assign it to a variable named \texttt{`x'} \\ [1ex]
+            \texttt{if (x < 15) myDog.bark(8)} & if \texttt{x} (value of \texttt{22}) is less than \texttt{15}, tell the dog to bark \texttt{8} times \\ [1ex]
+            \texttt{while (x > 3) \{ } & Keep looping as long as \texttt{x} is greater than \texttt{3} \\ [1ex]
+            \hspace{3mm}\texttt{myDog.play();} & Tell the dog to \texttt{play} \\ [1ex]
+            \texttt{\}} & End of the loop; everything in \texttt{\{\}} is done in the loop \\ [1ex]
+            \texttt{int [] numList = \{2,4,6,8\};} & Declare a list of integers variable \texttt{`numList'}, and put \texttt{2,4,6,8} into the list \\ [1ex]
+            \texttt{System.out.print(``Hello'');} & Print out \texttt{``Hello''} (in this case to the command line) \\ [1ex]
+            \texttt{System.out.print(``Dog:'' + name)} & Print out \texttt{``Dog: Fido''} as above \\ [1ex]
+            \texttt{String num = ``8'';} & Declare a character string variable \texttt{`num'} and give it the value of \texttt{``8''} \\ [1ex]
+            \texttt{int z = Integer.parseInt(num);} & Convert the string of characters ``8'' into an actual numeric value \texttt{8} \\ [1ex]
+            \texttt{try \{} & Try the executing code between \texttt{\{\}} \\ [1ex]
+            \hspace{3mm}\texttt{readTheFile(``myFile.txt'');} & Read a text file named \texttt{``myFile.txt''} \\ [1ex]
+            \texttt{\}} & End of try-block \\ [1ex]
+            \texttt{catch(FileNotFoundException ex) \{} & Declare exceptions to ``catch'' \\ [1ex]
+            \hspace{3mm}\texttt{System.out.print(``File not found.'');} & If code within try-block filed due to declared exception, print out \texttt{``File not found.''} \\
+            \texttt{\}} & End of exception-block                
+        \end{tabular}           
+    \end{center}
+
+    \section*{Code structure in Java}
+    \begin{itemize}
+        \item A \texttt{.java} source code file must hold \emph{one} \textbf{class} definition.
+        \item A \textbf{class} is a piece of a Java program.
+        \item Within a \textbf{class} there are one or more \textbf{methods}.
+        \item \textbf{Methods} must be held within \textbf{classes}.
+        \item Within each \textbf{methods} are \textbf{statements} that describe what each \textbf{method} should perform.
+    \end{itemize}
+
+    Java programs are run by the JVM, and must contain \emph{at lest one class} and one \emph{main method}. The \emph{main method} almost always look exactly like this:
+    \lstset{language=java, basicstyle={\small\ttfamily}}
+    \begin{lstlisting}
+public class MyFirstApp{
+    public static void main (String[] args) {
+        (your code here...)
+    }
+}        
+    \end{lstlisting}
+
+    Note: The \texttt{String[] args} assigns an array of strings to the \texttt{main} method, naming the argument \texttt{args}.
+    When running a Java program, the JVM searches for the \emph{main} method, runs all code within it before stopping. Code outside of the \emph{main} method must be called within the method. Several things to remember for Java syntax:
+
+    \begin{itemize}
+        \item Each statement must end with a `;',
+        \item Single line comments begins with //,
+        \item Whitespace generally do not matter,
+        \item Variables must be declare with a type (e.g. \texttt{int, double, char,} etc.),
+        \item Classes and methods must be enclosed with \{\}.
+    \end{itemize}
+
+    To declare a string array (like a list in python, use: )
+    \begin{lstlisting}
+String[] name = {``String1'', ``String2'', ``String3'';}
+    \end{lstlisting}
+
+    Some notes about string arrays:
+    \begin{itemize}
+        \item Arrays use 0-index (just like Python),
+        \item Use \texttt{.length} method to find length of array,
+        \item Use \texttt{name[index]} to access items in array,
+    \end{itemize}
+
+\end{document}

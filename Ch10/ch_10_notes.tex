@@ -1,0 +1,180 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 10 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}, breaklines=false}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{Static Methods and Variables}
+    Methods in a class can be flagged as \emph{static}, which allows them to be used without an instantiated object of the class. A static method is called by using its class name rather than its object reference variable name. A good example is methods within the \texttt{Math} class. The constructor within \texttt{Math} class is flagged as \texttt{private} and therefore instants of a \texttt{Math} class cannot be instantiated. However, essentially all methods in \texttt{Math} are flagged as \texttt{static}, they can still be called by using the class name, such as \texttt{Math.abs()} and \texttt{Math.round()}. A class can have both static and non-static methods. Aside from the different way they are called, there are additional limitations with static method. Instance variables within a class are utilized by methods, but if the methods are flagged as \texttt{static}, they cannot use any instance variables within the class. Consider:
+
+    \begin{lstlisting}
+public class Duck {
+    private int size;
+    public static void main(String[] args) {
+        System.out.println(``Size of duck is '' + size);
+        System.out.println(``Size of duck in '' + getSize());
+    }
+    public void setSize(int s) {
+        size = s;
+    }
+    public int getSize() {
+        return size;
+    }
+}     
+    \end{lstlisting}
+
+    In the listing above, the line of code \texttt{System.out.println(``Size of duck is '' + size);} will cause compilation failure. The reason being is that \texttt{main()} is flagged as a static method (as all \texttt{main()} method are and should be), and \texttt{size} is not a static variable, and thus cannot be called within \texttt{main()}. In this particular case, if the user desire to print the value of the \texttt{size} variable out, the \texttt{System.out.println()} method should be written in a separate non-static method, which can be called by declaring a object reference variable of the \texttt{Duck} class and assigning it to a new \texttt{Duck} object, and calling this new non-static method via the object reference variable. The code of line \texttt{System.out.println(``Size of duck is '' + size);} will also cause compilation failure, as \texttt{getSize()} is not flagged as static, and cannot be accessed by \texttt{main()}. 
+
+    Like methods, variables can also be declared as \texttt{static}. Consider the code listing presented previously, where \texttt{size} is a \texttt{private} instance variable of the \texttt{int} type. Assuming the rest of the code body was corrected to allow for compilation, each instance of a \texttt{Duck} object would have its own \texttt{size} instance variable independent of each other. In other words, setting the value of \texttt{size} via \texttt{setSize()} on one \texttt{Duck} object would not have any affect on any other \texttt{Duck} objects. However, if the code for the \texttt{Duck} class is modified, such that \texttt{size} is now flagged as static (\texttt{private static int size;}), there will only be one \texttt{size} variable shared among all created \texttt{Duck} objects. Changing the value of \texttt{size} will now change the value of \texttt{size} for all other \texttt{Duck} objects. Flagging an instance variable as \texttt{static} removes ambiguity, and thus can be called by static methods. This also applies to methods flagged as \texttt{static} as well; they can be called by other static methods. Static variables are initialized whenever the class itself is \emph{loaded}, which can be before any instance of the class is instantiated. Consider:
+
+    \begin{lstlisting}
+class Player {
+    static int playerCount = 0;
+    private String name;
+    public Player(String n) {
+        name = n;
+        playerCount++;
+    }
+}
+    \end{lstlisting}
+
+    The variable \texttt{playerCount} in class \texttt{Player} is a static variable. Which means even before any instance of \texttt{Player} is instantiated, the variable \texttt{playerCount} can be assessed by calling \texttt{Player.playerCount}, which will have a value of \texttt{0}. The constructor of \texttt{Player} automatically increments \texttt{playerCount} by \texttt{1} each time a \texttt{Player} object is instantiated (\textit{e.g.} Player p = new Player();), therefore the value of \texttt{playerCount} will be \texttt{1} (or however many) afterwards, can be be called either by \texttt{Player.playerCount} or using the object reference variable of the object instance (\textit{e.g.} p.playerCount). The \texttt{name} variable in \texttt{Player} is not a static variable, and can only be accessed after an instance of \texttt{Player} is instantiated. 
+
+    \section*{\texttt{Final} class, methods, and variables}
+    Class, methods, and variables can be flagged as \texttt{final}, which prevents them to be modified. Classes that are flagged as \texttt{final} cannot be further extended, which means no subclasses can be created out of them. Methods, whether flagged as \texttt{static} or not, if flagged as \texttt{final} cannot be overridden by any subclasses. The values of any variables flagged as \texttt{final} cannot be changed. In the case of \texttt{static} variables, these are often used as \emph{constants}, which by convention have names that are all-capitalized. Declared \texttt{static final} variables must be initialized within the class or method it was declared at, otherwise the code will not compiled (because it will be impossible to assign a value to the variable later as \texttt{finally} variable's value cannot be changed.) There are two equally valid way to initialize a \texttt{static final} variable:
+
+    \begin{lstlisting}
+public class Foo {
+    public static final int SOME_NUMBER = 25;
+}
+
+// or
+
+public class Foo {
+    public static final int SOME_NUMBER;
+
+    static {
+        SOME_NUMBER = (int) 25 * Math.random();
+    }
+}
+    \end{lstlisting}
+
+    In the first example, the constant \texttt{SOME\_NUMBER} is initialized as \texttt{25}, and can no longer be changed. The second example is also valid, and is useful the the value of the constant is to have some more complexity (\textit{e.g.} requiring more than 1 line of code, etc.) The code within \texttt{static()} behaves like a static variable declaration; it runs as soon as the class it resides in loads. Therefore no instance of the class needs to be instantiated for the variable to be assigned value. 
+
+    Other non-static variables, such as instance variables that aren't static, local variables, arguments/parameters, etc. can also be flagged as \texttt{final}, which simply prevents its value from changing once initialized. 
+
+    \section*{Wrappers}
+
+    In Java, primitives such as \texttt{boolean}, \texttt{int}, and \texttt{float} are not objects, which means additional processing needs to be done to them if any code or operation only applies to objects. This also has implication to memory management as only objects exists on the memory heap. In the current Java version, most of these operation, called \emph{wrappting}, is done behind the scene by the compiler/JVM. A \emph{wrapper} is an object that ``wraps around'' a corresponding primitive type, and enabling them to behave as if they are an object. The name of each wrapper is the capitalized name of their corresponding primitive type (\textit{e.g.}, \texttt{}{\textbf{Boolean}} is the wrapper for \texttt{boolean}), except in the case for \texttt{int} and \texttt{char}, their corresponding wrappers are named \texttt{Integer} and \texttt{Character}. A wrapper is a class of objects that has its own methods, which makes them useful for methods to be called on primitives (which would be impossible otherwise as primitives are not objects and thus has no methods of their own.) Most primitive wrapping and unwrapping are done implicitly, but can also be done explicitly. For example:
+
+    \begin{lstlisting}
+int i = 288;
+Integer iWrapped = new Integer(i);
+int iUnwrapped = iWrapped.intValue();
+    \end{lstlisting}
+
+    Implicit wrapping and unwrapping in new versions of Java is most obvious when dealing with \texttt{ArrayList}, which only accepts objects into the array. For example:
+
+    \begin{lstlisting}
+ArrayList<Integer> listOfIntegers = new ArrayList<Integer>;
+listOfIntegers.add(42);
+int num = listOfIntegers.get(0);
+    \end{lstlisting}
+
+    In this above listing, \texttt{listOfIntegers} was declared as a parameterized \texttt{ArrayList} that only accepts \texttt{Integer} objects/wrappers. However, adding the integer primitive \texttt{42} to it is legal because the compiler automatically wraps \texttt{42} in an \texttt{Integer} wrapper. Using the \texttt{get()} method and plugging this \texttt{Integer} wrapper (containing \texttt{42}) into a primitive variable \texttt{num} is also legal as the compiler automatically unwraps the wrapper. Note that parameterizing \texttt{ArrayList} to primitives, such as \texttt{ArrayList<int>} is not legal. 
+
+    \emph{Autoboxing}, that is, auto-wrapping and auto-unwrapping, occurs elsewhere in Java as well. Here are a few examples:
+    
+    \begin{itemize}
+        \item Method arguments --- Consider the method \texttt{void takeNumber(Integer i) \{\}}, which requires an \texttt{Integer} wrapper argument. An \texttt{int} or \texttt{Integer} are both valid type of argument due to autoboxing. The reverse is true as well, if the method is declared to accept an \texttt{int} argument.
+        \item Return values --- Similar to above, in a method that was declared to return an \texttt{int}, an\texttt{Integer} wrapper can be returned instead, and \texttt{vice versa}.
+        \item Boolean expressions --- Boolean expressions in conditional statements such as \texttt{if} or \texttt{while} can accept either \texttt{boolean} primitives or \texttt{Boolean} wrappers.
+        \item Mathematic operations --- Despite the face that wrappers are objects, they can be treated as primitive numbers in Java mathematic operations. For example, if \texttt{i} is an \texttt{Integer} wrapper that contains the integer \texttt{4}, \texttt{i + 4} is legal in Java coding, despite the fact that i is technically an object reference variable, not a primitive. 
+        \item Assignments --- During variable initialization, a wrapper or a primitive can be assigned to its corresponding variable type. For example, if \texttt{x} is an \texttt{int} with a value of 3, \texttt{Integer y = x;} is valid.
+    \end{itemize}    
+
+    One key thing to note that wrappers are objects, and thus the complexity between objects and object reference variables, their location in memory (stack or heap) applies to them. In Java, strings are objects as well (hence \texttt{String}), and conversion between \texttt{String} and various primitives are performed with autoboxing in between. Methods that converts primitives to and from \texttt{String} are static methods within their corresponding wrapper class. For example, if a \texttt{String} object \texttt{s} has value of \texttt{``2''}, to convert it to an \texttt{int} one can use the code \texttt{int x = Integer.parseInt(s);}. The applies to other primitives/wrappers as well, with the same method naming convention (\textit{e.g.} \texttt{parseDouble()}, \texttt{parseBoolean()}). To convert a primitive to a string, the static method of each wrapper \texttt{toString()} can be used similarly.
+
+    \section*{String Formatting}
+    String formatting in Java heavily utilizes the static method in the \texttt{String} class, \texttt{format()}. There is great flexibility available given the syntax:
+
+    \begin{lstlisting}
+String.format(``%[argument number][flags][width][.precition]type'', arg)
+    \end{lstlisting}
+
+    Each component in the syntax is as follows:
+
+    \begin{itemize}
+        \item \texttt{\%} --- Indicate the where formated argument should be inserted.
+        \item \texttt{[argument number]} --- Optional; used to specify argument to apply formatting to if there are more than one arguments.
+        \item \texttt{[flags]} --- Optional; indicate special formatting options, such as inserting commas in large numbers.
+        \item \texttt{[width]} --- Optional; specify minimum number of characters to use. If the argument is longer than the specified width it will be ignored.
+        \item \texttt{[.precision]} --- Optional; floating point precision (\textit{i.e.} decimal place), always begins with a period.
+        \item \texttt{type} --- Mandatory; indicate argument type:
+        \begin{itemize}
+            \item \%d --- Applies to integer arguments, will format to decimal integers (whole numbers).
+            \item \%f --- Applies to any floating point (\texttt{float} or \texttt{double}), will format to decimal integers.
+            \item \%e --- Applies to any floating point, will format to scientific notation.
+            \item \%x --- Applies to integer, will format to hexadecimal string.
+            \item \%c --- Applies to single characters (\texttt{char} type), will format to Unicode character.
+            \item \%s --- Applies to any data type, will format to \texttt{String} value.
+            \item \%t --- Applies to date/time data types (including from class \texttt{Date} and \texttt{Calendar}), will format according to additional flag added after \%t.
+        \end{itemize}
+    \end{itemize}
+
+    Based on this syntax, string formating can be use to insert variable values into string values:
+
+    \begin{lstlisting}
+int one = 20456654;
+double two = 100567890.248907;
+String s = String.format(``The rank is %,d out of %,.2f'', one, two);
+    \end{lstlisting}
+
+    The \texttt{\%} specify where each variable value should be inserted. Since there are more than one arguments (two, in this case), Java will insert them in order. That is, the value of \texttt{one} to the first \texttt{\%} and \texttt{two} to the second \texttt{\%}. The \texttt{,} is a \emph{flag} that tell Java to formate the numeric value with commas every three digits. The \texttt{d} tells Java to expect an \texttt{int} (or an \texttt{Integer}), and will format it just as a whole number. The \texttt{.2} tells Java to formate the floating point into a number with two decimal place. And finally the \texttt{f} tells Java to expect a floating point data type, and to formate it as a decimal number. The resulting string value of \texttt{s} is:
+
+    \begin{lstlisting}
+The rank is 20,456,654 out of 100,567,890.25
+    \end{lstlisting}
+
+    \section*{Time and Date in Java}
+    \texttt{Date} is a class in Java where new instance of this object contains a time stamp value of the current time in this format:
+
+    \begin{lstlisting}
+Sun Nov 28 14:52:41 MST 2004
+    \end{lstlisting}
+
+    Each component of the time stamp is not fixed to a specific format. For example, \texttt{Nov} can be made to display as \texttt{November}. \texttt{Date} objects can be used in string formatting:
+
+    \begin{lstlisting}
+Date today = new Date();
+String.format(``%tA, %tB %td'', today, today, today)
+// this will display as: Sunday, November 28
+     \end{lstlisting} 
+
+    Using the \texttt{\%t} flag in string formatting, an additional flag must follow. In this case, \texttt{A} gives the day of the week (long form), \texttt{B} the full month name, and \texttt{d} the day of the month in roman numerals. To avoid making three separate instance of \texttt{today}, \texttt{String.format(``\%tA, \%<tB \%<td'', today);} can be used instead. The \texttt{<} symbol tells Java to reuse the previous argument. There are many more flags that can be use for \texttt{\%t} to achieve the desired results.
+
+    If more complex time and date manipulation beyond just using the current date/time is needed, then the \texttt{Calendar} class should be used. The \texttt{Calendar} class, like \texttt{ArrayList}, is in \texttt{java.util.*} and must be imported to be utilized. The \texttt{Calendar} class is an abstract class, so new instance of it cannot be created normally, but instead the static method \texttt{Calendar.getInstance()} should be used to assigned a new \texttt{Calendar} ``instance'' to a \texttt{Calendar} class object reference variable. The \texttt{Calendar} class overs much more flexibility compared to \texttt{Date}:
+
+    \begin{lstlisting}
+import java.util.Calendar;
+
+Calendar c = Calendar.getInstance();
+c.set(2004, 0, 7, 15, 40);
+long day1 = c.getTimeInMillis();
+day1 += 1000 * 60 * 60;
+c.setTimeInMillis(day1);
+c.add(c.DATE, 35);
+c.roll(c.DATE, 35);
+c.set(c.DATE, 1);
+    \end{lstlisting}
+
+    Each line of the above code illustrates an example on the flexibility of \texttt{Calendar}. Once an object of \texttt{Calendar} (really one of its subclass as itself is an abstract class), the time can be set with \texttt{set()}, which accepts exactly five arguments in the format of year, month (based in 0, like array index), day, hour(24-hour format), and minute. \texttt{Calendar} allows for precise time adding and subtracting by converting its time to milliseconds with \texttt{getTimeInMillis()}, adding/subtracting desired time from it (in units of milliseconds), then resetting the time in the \texttt{Calendar} object by using \texttt{setTimeInMillis()}. Or, individual component, such as the date can be accessed (in this case, via \texttt{c.DATE}), and manipulated with methods such as \texttt{add()} (add units of time, in this case days) or \texttt{roll()} (add units of time, in this case days, but do not increment the next greater unit of time, in this case adding 35 days but do not advance the month). The \texttt{set()} method is overloaded such that if a component field of the object (\textit{e.g.} \texttt{c.DATE}) and a number is passed instead, it would set only that component field (in this case, setting c.DATE, the day of the month, to 1).
+
+\end{document}

@@ -1,0 +1,95 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 4 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{Object methods}
+    Objects created from the same class will have the same instance variables (but not the same values) and the same methods as described by the class. However, the methods might behave differently across objects from the same class due to method dependence on its instant variables' values. For example, a method for a \emph{Dog} class might have a method \texttt{bark()} that has a conditional statement that depends on the instance variable \texttt{size}.
+
+    Like functions (and methods) in other programming language, Java object's methods can use parameters by passing arguments when calling them. A method for the class \emph{Dog} can be written to accept arguments or not, here is one that does not accept arguments:
+
+    \begin{lstlisting}
+void bark() {
+    System.out.println(``ruff'');
+}
+    \end{lstlisting}
+
+    In this case to have the \emph{Dog} bark multiple times you would call the method multiple times outside the code of the method itself. However, you can also write the \texttt{bark()} method to accept an integer argument:
+
+    \begin{lstlisting}
+void bark(int numOfBarks) {
+    while (numOfBarks > 0) {
+        System.out.println(``ruff'');
+        numOfBarks = numOfBarks - 1;
+    }
+}
+    \end{lstlisting}
+
+    In this version of \texttt{bark()} the user will specify how many times they want the \emph{Dog} to bark by passing an argument to it. Methods can accept multiple arguments if it was defined to have the same number of parameters:
+
+    \begin{lstlisting}
+void takeTwo(int x, int y) {
+    int z = x + y;
+    System.out.println(``Total is '' + z);
+}
+    \end{lstlisting}
+
+    Note that when passing arguments to a method, they can be values or variables, as long as the type matches. So:
+
+    \begin{lstlisting}
+takeTwo(34, -55);
+int spam = 45;
+
+int egg = 99;
+takeTwo(spam, egg)
+    \end{lstlisting}
+
+    Both method calls are valid because the arguments are of the right type. When passing variables as arguments to methods, take note that any changes to the variable passed as argument does \textbf{NOT} change the value of the variable itself. That is:
+
+    \begin{lstlisting}
+int x = 7;
+int go(int z){
+    z = 0;
+    return z
+}
+System.out.println(foo.go(x));
+System.out.println(x);
+    \end{lstlisting}
+
+    Here \texttt{go()} is a method that takes any integer and returns 0. An integer variable \texttt{x} with the value of \texttt{7} was passed as an argument to \texttt{go()}, and thus when the \texttt{println()} method was called \texttt{0} was printed to the screen. However, then \texttt{println()} was called again to print \texttt{x} to the screen it will print \texttt{7}. The \texttt{go()} method only made a \textbf{COPY} of the value of \texttt{x} and never modified the value of \texttt{x} itself. In Java, all arguments are \emph{passed-by-copy} (or: passed by value). 
+
+    In Java, distinguishing a method that returns a value is not trivial and must be declared at the beginning. Java methods \textbf{MUST} declare return type, even when no return value is desired; in that case \texttt{void} needs to be declared. A \texttt{void} method returns no value. The return value of a method is type limited, depending on what was declared in the beginning. For example:
+
+    \begin{lstlisting}
+int giveSecret() {
+    return 42;
+}
+    \end{lstlisting}
+
+    This method is valid and compatible because it was declared to return an \texttt{int} value, and it did (\texttt{42}). To return multiple values of the same type, a method can be declared with an array argument. 
+
+    \section*{Object Encapsulation}
+    Instance variables that can be freely accessed and modified are dangerous and lead to unexpected behavior or malicious attack. For example, malicious users can modify an exposed instance variable by \texttt{car.velocity = -20;}, which would presumably crash a program. Thus, it is good practice to \emph{encapsulate} all object instance variables by flagging them \texttt{private}, and add \texttt{public} mutator methods for the appropriate access. Consider:
+
+    \begin{lstlisting}
+class GoodDog {
+    private int size;
+    public int getSize() {
+        return size;
+    }
+    public void setSize(int s) {
+    size = s;
+    }
+}       
+    \end{lstlisting}
+
+    Methods and other codes outside of \texttt{GoodDog} cannot access or modify \texttt{GoodDog.size} because instance variable is set to private. A public mutator method --- \texttt{GoodDog.setSize()} --- to set the value of \texttt{  GoodDog.size}.
+
+\end{document}

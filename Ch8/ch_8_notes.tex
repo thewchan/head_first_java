@@ -1,0 +1,244 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 8 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}, breaklines=true}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{Polymorphism and Object References}
+    It is important to remember that when a variable is created to refer to an object in Java, the variable itself is \emph{not} a representation of the object itself, rather, it is a \emph{reference} to the object. In essence, once a variable referring to an object is declared, \emph{two} object is ``created''; the object itself, and the object reference (\textit{i.e.} the variable.) There are implications to the type of the object and the object reference:
+
+    \begin{enumerate}
+        \item The object reference variable declared and the object created is of the same type. This is the most obvious case, for example:
+
+        \begin{lstlisting}
+Wolf aWolf = new Wolf();
+        \end{lstlisting}
+
+        \item The object reference variable declared and the object created is NOT the same type. This is possible due to polymorphism:
+
+        \begin{lstlisting}
+Animal aWolf = new Wolf();
+        \end{lstlisting}
+
+        In this case, the object reference variable (\texttt{aWolf}) is of type \texttt{Animal}, the superclass of class \texttt{Wolf}, while the object created that (\texttt{aWolf}) makes reference to is of type \texttt{Wolf}. 
+    \end{enumerate}
+
+    \section*{Abstract Classes and Methods}
+    Often superclass are created as a template for subsequent subclasses, and it may not be sensible for instance of the superclass itself to be created. An example would be while \texttt{Wolf} and \texttt{Hippo} are \emph{concrete} classes (that is, instances of that class would be sensible to create), they can be inherited from a superclass \texttt{Animal}. An object instance of \texttt{Animal} is perhaps meaningless and insensible, and can be thought of existing only to provide a template for specific animal subclasses to inherit from. In this case, \texttt{Animal} can be flagged as an \texttt{abstract} class:
+
+    \begin{lstlisting}
+abstract class Animal {
+    private int instvar;
+    public void method1() {}
+    public void method2() {}
+}
+
+abstract class Canine extends Animal {
+    public void method2() {}
+    public void method3() {}
+}
+
+class Wolf extends Canine {
+    public void method3() {}
+}
+    \end{lstlisting}
+
+    In the above example, \texttt{Animal} is an abstract superclass with the instance variable \texttt{instvar} and method \texttt{method1()} and \texttt{method2()}. Since \texttt{Animal} was flagged as \texttt{abstract} it can never be instantiate (\textit{i.e.} \texttt{Animal a = new Animal();} will not compile and will raise an error) and can only be inherited. The class \texttt{Canine} is a subclass inheriting from \texttt{Animal} that overrides \texttt{method2()} and adds \texttt{method3()}. However, \texttt{Canine} is \emph{also} flagged \texttt{abstract} and therefore cannot be instantiated. Class \texttt{Wolf} is a subclass of \texttt{Canine} (and therefore also a subclass of \texttt{Animal}), and has the same instance variable and methods as \texttt{Canine} except it overrides \texttt{method3()} with its own. However, because \texttt{Wolf} is not flagged \texttt{abstract} it is a \emph{concrete} class and can be instantiated as expected. Note that whether or not a class is flagged \texttt{abstract} or not has no bearing on it's ability to be inherited (in contrast with classes flagged as \texttt{final} or \texttt{private}, which restricts inheritance behavior.)
+
+    Like classes, individual methods can be flagged as \texttt{abstract} as well \emph{if the class it resides in is an abstract class}. An abstract method is declared with no code body:
+
+    \begin{lstlisting}
+abstract class Animal {
+    private int instvar;
+    abstract public void method1();
+    public void method2() {}
+}
+
+abstract class Canine extends Animal {
+    public void method2() {}
+    public void method3() {}
+}
+
+class Wolf extends Canine {
+    public void method1() {}
+    public void method3() {}
+}
+
+    \end{lstlisting}
+
+    Abstract methods can be declared in any abstract superclasses, but down the inheritance tree they must be fully implemented at this first instance of a concrete subclass. In the above example, \texttt{method1()} in \texttt{Animal} was declared as an abstract method. It is inherited by \texttt{Canine}, which because it is itself also an abstract class, it did not have to implement the abstract method \texttt{method1()}. However, \texttt{Wolf} being the first concrete class down this inheritance tree that inherited \texttt{method1()} it must implement it by overriding the abstract method with its own code. Failing to implement an inherited abstract method in a concrete class will raise errors during compilation. 
+
+    \section*{The \texttt{Object} Superclass}
+    The \texttt{Object} class in Java is a hidden class of which all objects inherited from. This implies that any classes created by the user can utilize polymorphism with the \texttt{Object} superclass. Some methods in the \texttt{Object} superclass that are inherited by all other objects in Java include:
+
+    \begin{enumerate}
+        \item \texttt{equals(Object o)} --- Evaluates if the object the method was called upon and the object argument passed (in this case the object \texttt{o}) is equal and returns a Boolean value.
+        \item \texttt{getClass()} --- returns the class that object was instantiate from.
+        \item \texttt{hashCode()} --- returns a unique hash code of the object.
+        \item \texttt{toString()} --- returns a \texttt{String} that represents the object (\texttt{name@memory-location}).
+    \end{enumerate}
+
+    There are important nuances with polymorphism that can be illustrated with polymorphic references of type \texttt{Object}. Consider the following example with \texttt{ArrayList}:
+
+    \begin{lstlisting}
+ArrayList<Object> myDogArrayList = new ArrayList<Object>();
+Dog aDog = new Dog();
+myDogArrayList.add(aDog);
+// Dog d = myDogArrayList.get(0)
+    \end{lstlisting}
+
+    The first three lines of the above listing is valid. The variable \texttt{myDogArrayList} was declared as an \texttt{ArrayList} parameterized to only take \texttt{Object} class elements. Since all other objects (including \texttt{Dog}) inherits from \texttt{Object}, \texttt{myDogArrayList} can hold elements that is of the class \texttt{Dog} (\textit{e.g.} \texttt{aDog}, in this case.) However, the commented out last line of code is not valid and will not compile. This is because each objects in \texttt{myDogArrayList} are actually \textbf{object references}, not the objects themselves, and because \texttt{myDogArrayList} was declared as an \texttt{ArrayList} parameterized to only hold \texttt{Object} class elements, all \textbf{object reference} elements in \texttt{myDogArrayList} are of class \texttt{Object} and not class \texttt{Dog}. In the last lined of (commented out) code, an attempt to declare a class \texttt{Dog} variable from the class \texttt{Object} \textbf{object reference} object, which will fail at compilation because there isn't a way to automatically convert \texttt{Object} to \texttt{Dog} (this would be similar to trying to declare a variable of a primitive type with a primitive of something different, \textit{e.g.} \texttt{int x = ``1'';}). 
+
+    This nuance between object reference type and object type in polymorphism also manifest in arguments and return types. For example:
+
+    \begin{lstlisting}
+public Object getObject(Object o) {
+    return o;
+}
+
+public void go() {
+    Dog aDog = new Dog();
+    // Dog bDog = getObject(aDog);
+}
+    \end{lstlisting}
+
+    Here a method \texttt{getObject()} was declare to take an \texttt{Object} argument and returns the same \texttt{Object}. In another method \texttt{go()}, a \texttt{Dog} class variable \texttt{aDog} was created. This variable is an object reference to the \texttt{Dog} class object, which itself is also of the class \texttt{Dog}, was passed to \texttt{getObject()}. This is valid due to polymorphism; \texttt{getObject()} takes any \texttt{Object} as an argument, but \texttt{aDog} of \texttt{Dog} class is a subclass of \texttt{Object} and therefore can be passed into the \texttt{getObject()} method (that is, the IS-A test ``a Dog IS-A(N) Object'' passes.) However, the last line of commented out code is invalid. This is because the return value of \texttt{getObject()} is a class \texttt{Object} \textbf{object reference} to the \texttt{Dog} class \texttt{aDog} (not the \texttt{Dog} class itself), and attempting to declare an object of \texttt{Object} class as a \texttt{Dog} class variable is invalid.
+
+    A similar implication is methods of classes is true. Consider this example:
+
+    \begin{lstlisting}
+class Dog {
+    void bark() {}
+}
+
+public Object getObject(Object o) {
+    return o;
+}
+
+public void go() {
+    Dog aDog = new Dog();
+    Object bDog = getObject(aDog);
+    bDog.hashCode();
+    // bDog.bark();
+}
+    \end{lstlisting}
+
+    Here it is established that the \texttt{Dog} class (which like all objects are a subclass of \texttt{Object}) has a method \texttt{bark()}, and the \texttt{getObject()} method is defined as previously. In this version of \texttt{go()}, the line \texttt{Object bDog = getObject(aDog);} avoids the previous error; the \texttt{aDog} (which is of class \texttt{Dog} and thus has the \texttt{bark()} method) is passed to \texttt{getObject} which returns an \texttt{Object} class object reference, was declared as a class \texttt{Object} variable \texttt{bDog}. The next line of code is valid; \texttt{hashCode()} is a method in all objects of \texttt{Object} class, and \texttt{bDog}, while an object reference pointing to a \texttt{Dog} class object, is of class \texttt{Object} naturally possesses the \texttt{hashCode()} method. However, the last commented out line of code is not valid, because even though \texttt{bDog} points to a \texttt{Dog} class method, it is itself an object reference method of class \texttt{Object} and do not possess the method \texttt{bark()}, and this line of code will cause compilation to fail.
+
+    A helpful way to clarify the thinking behind this nuance is to think of an object like concentric circles. A \texttt{Dog} class object can be thought of as two concentric circle, with the inner circle of the class \texttt{Object} and the outer circle of the class \texttt{Dog}. A \texttt{Dog} class object really is just one object that is both a \texttt{Dog} and an \texttt{Object} (a Dog IS-A(N) Object). However, difference classes of object references can be created for a \texttt{Dog} class object. A \texttt{Dog} class object reference (\textit{e.g.} \texttt{Dog aDog = new Dog();}) ``points'' to the outer circle, and thus has access of all the methods, variables, and other members of both class \texttt{Dog} and \texttt{Object}. However, a \texttt{Object} class object reference to the \texttt{Dog} class object (\textit{e.g.} \texttt{Object bDog = new Dog();}) points to the inner circle, and only has access to variables/methods/members of the \texttt{Object} class. Both \texttt{aDog} and \texttt{bDog} are object references that is referencing a \texttt{Dog} class object, but has different level of access.
+
+    The above behavior described is not limited to just for the class \texttt{Object}, but in fact to all levels in inheritance and must be taken into account whenever polymorphism is utilized.
+
+    \section*{Casting}
+    Creating an object reference to an object do not modify the object it is referencing in anyway. That means that declaring an \texttt{Object} class variable to a class \texttt{Dog} object: \texttt{Object bDog = new Dog();} does not strip the \texttt{Dog} object of its ``Dog-ness''. In fact the \texttt{bDog} object reference can be \emph{casted} back to the class \texttt{Dog}:
+
+    \begin{lstlisting}
+class Dog {
+    void bark() {}
+}
+
+public Object getObject(Object o) {
+    return o;
+}
+
+public void go() {
+    Dog aDog = new Dog();
+    Dog bDog = (Dog) getObject(aDog);
+    bDog.hashCode();
+    bDog.bark();
+}        
+    \end{lstlisting}
+
+    The key line of code here is \texttt{Dog bDog = (Dog) getObject(aDog);}, which tells the compiler to \emph{cast} the returning \texttt{Object} class object reference from \texttt{getObject()} to class \texttt{Dog}. This is possible because \texttt{getObject()} really didn't modify \texttt{aDog}, but rather returned an object reference ``pointing'' to the ``inner (Object) circle'' of the \texttt{Dog} class object. By casting the returning object reference from \texttt{getObject()} with \texttt{(Dog)}, the object reference is now ``pointing'' to the ``outer (Dog) circle'' of the \texttt{Dog} class object. The resulting \texttt{bDog} variable thus has access to both \texttt{Object} class and \texttt{Dog} class methods (and other class members.)
+
+    \section*{Interfaces}
+    Java has limited support to multiple inheritance (that is, a class that in inheriting from multiple superclass at the same level), and it is generally desirable to avoid that. However, it might be sometimes sensible for certain subclasses within an inheritance tree to implement the same class members, while others do not. For example, using the superclass \texttt{Animal} as an illustration again, perhaps certain concrete subclasses like \texttt{Dog} and \texttt{Cat} can benefit from having class elements that enable there usage in a program for a pet store. Like other subclasses of \texttt{Animal}, \texttt{Dog} and \texttt{Cat} has methods like \texttt{roam()} and \texttt{eat()} just like \texttt{Hippo} and \texttt{Lion}. However, it is not feasible to create another level of inheritance \texttt{Pet} because \texttt{Dog} and \texttt{Cat} already inherits from different subclasses within the \texttt{Animal} inheritance tree:
+
+    \begin{lstlisting}
+abstract class Animal {
+    private int instvar;
+    abstract public void eat();
+    public void sleep() {}
+}
+
+abstract class Canine extends Animal {
+    public void bark() {}
+}
+
+class Wolf extends Canine {
+    public void eat() {}
+    public void bark() {}
+}
+
+class Dog extends Canine {
+    public void eat() {}
+}
+
+abstract class Feline extends Animal {
+    public void purr() {}
+}
+
+class Lion extends Feline {
+    public void eat() {}
+    public void purr() {}
+}
+
+class Cat extends Feline {
+    public void purr() {}
+}
+    \end{lstlisting}
+
+    Consider the inheritance relationships above. \texttt{Cat} and \texttt{Lion} inherits from \texttt{Feline}, \texttt{Wolf} and \texttt{Dog} inherits from \texttt{Canine}, and both \texttt{Feline} and \texttt{Canine} in turns inherit from \texttt{Animal}. It is not feasible to create another level in inheritance to give \texttt{Dog} and \texttt{Cat} common ``Pet'' methods because they are in different inheritance sub-trees, and also it is not desirable to give \texttt{Wolf} and \texttt{Lion} ``Pet'' methods. 
+
+    The easiest and most appropriate solution in this case is to utilize \textbf{interface}. An interface is similar to a class, except that all its methods \emph{must} be abstract. It technically exist outside of an inheritance tree, and its methods, as they are all abstract, do not contain code body, and must be implemented by any concrete class implementing them. In this way, interfaces are similar to abstract classes, offering opportunities for templates and protocols for class members to be applied to some but not all subclasses of an inheritance tree. One way to think about this is that interface give classes \emph{roles}. For the above example, the desired \texttt{Pet} interface can be implemented this way: 
+
+    \begin{lstlisting}
+public interface Pet {
+    public abstract void beFriendly();
+    void play();
+}
+
+class Dog extends Canine implements Pet {
+    public void eat() {}
+    public void beFriendly() {}
+    public void play() {}
+}
+
+class Cat extends Feline implements Pet {
+    public void purr() {}
+    public void beFriendly() {}
+    public void play() {}
+}
+    \end{lstlisting}
+
+    Both class \texttt{Dog} and \texttt{Cat} both now \emph{implement} the interface \texttt{Pet} now. Note all methods within any interface are implicitly \texttt{public} and \texttt{abstract}; restating those keywords are redundant. By implementing an interface, a class now possesses all the abstract methods in that interface, and if the class is concrete, it must implement (that is, give the method code body) those methods because they are abstract. Unlike class inheritance, any class can implement any number of interfaces. For example, \texttt{Dog} can implement more than one interfaces like \texttt{Pet}, \texttt{ServiceAnimal}, \texttt{Omnivore}, etc. While a variable or an object cannot be instantiated out of an interface (because it behaves somewhat like an abstract class), an array or \texttt{ArrayList} can be created to be of an interface type (or in the case of ArrayList, parameterized.):
+
+    \begin{lstlisting}
+public interface Pet {}
+
+class Dog implements Pet {}
+
+class Wolf {}
+
+Dog aDog = new Dog();
+Wolf aWolf = new Wolf();
+
+Pet[] interfaceArray = new Pet[3];
+ArrayList<Pet> interfaceArrayList = new ArrayList<Pet>;
+
+interfaceArray[0] = aDog;
+interfaceArrayList.add(aDog);
+
+// interfaceArray[1] = aWolf;
+// interfaceArrayList.add(aWolf);
+    \end{lstlisting}
+
+    The rules for an array or an \texttt{ArrayList} declared to be of an interface type (or in the case of an \texttt{ArrayList}, parameterized to) is similar to class polymorphism discussed previously. In the above case, \texttt{interfaceArray} and \texttt{interfaceArrayList} both can only accept elements that had implemented the interface \texttt{Pet}. This is why adding a \texttt{Dog} class element (\texttt{aDog}) is valid, but the last two line of the code (commented out) are not valid because \texttt{aWolf} is of the class \texttt{Wolf} that do not implement \texttt{Pet}.
+
+\end{document}

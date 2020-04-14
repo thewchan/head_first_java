@@ -1,0 +1,149 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 12 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}, breaklines=false}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{Graphical User Interface in Java}
+    Many toolkits and packages are available in Java to implement GUIs. Among these, the package \texttt{Swing} and \texttt{AWT} are both robust and easy to use. Like any other aspects in Java programing, elements in \texttt{Swing}-implemented GUIs are objects, and the properties of each elements can be adjusted and modified with the object's instance variables and methods. To use \texttt{Swing} in Java, \texttt{java.swing.*} must first be imported. In a single window implementation of a \texttt{Swing} GUI, all desired elements desired take place in a \texttt{JFrame}; an object that represents a window in the user's OS:
+
+    \begin{lstlisting}
+JFrame frame = new JFrame();
+    \end{lstlisting}
+
+    Here the object reference variable \texttt{frame} is assigned to a new \texttt{JFrame} object (also named \texttt{frame}). The \texttt{JFrame} object has many methods available to adjust its appearance:
+
+    \begin{lstlisting}
+frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+frame.setSize(300, 300);
+frame.setVisible(true);
+    \end{lstlisting}
+
+    These method calls sets the closing-behavior, dimension in pixels, and visibility respectively. Additional elements cannot be directly added to the \texttt{JFrame}, but rather on its \texttt{ContentPane}. These elements can be buttons, check boxes, text field, radio buttons, and so forth, collectively referred to as \emph{widgets}. All widgets are objects, and must be instantiated and assigned first before being added to the content pane:
+
+    \begin{lstlisting}
+JFrame frame = new JFrame;
+JButton button = new JButton(``Text on the button'');
+
+frame.getContentPane().add(BorderLayout.CENTER, button);
+    \end{lstlisting}
+
+    A couple of things of note here. Firstly, as mentioned the newly instantiated \texttt{button} (of the \texttt{JButton} class) cannot be directly added to \texttt{frame}. Within the \texttt{JFrame} object \texttt{frame}, there exist a private instance variable that references the actual content pane of the \texttt{JFrame} object in which widgets can be added onto. In Java, it is possible to use chained \texttt{.}-operator to access methods of a returned variable, which is how the code above was able to access the \texttt{add()} method of the content pane object within \texttt{frame}. The second thing of note is that \texttt{BorderLayout} is the default layout manager for \texttt{JFrame}, however accessing it requires importing \texttt{java.awt.*}. Because code exist within \texttt{JFrame} object constructor to account for \texttt{BorderLayout} usage, if a new instance of \texttt{JFrame} object has already been instantiated then there is no need to instantiate \texttt{BorderLayout} itself to use it as a positional argument for widget placements. To specify position placements using \texttt{BorderLayout}, \texttt{CENTER, NORTH, SOUTH, EAST}, and \texttt{WEST} can be used. 
+
+    \section*{Swing GUI Dynamics, Events, and Listeners}
+    Widgets on a GUI can be interacted by the user to effect changes to the program. To do this, the GUI has to know what event would trigger a change, as well as the nature of the change itself. In \texttt{Swing}, most widgets are programed to generate an \texttt{ActionEvent} object when interacted with (\textit{e.g.} a \texttt{JButton} object being clicked on). The generated event object carries the data about the nature of the event itself, but doesn't affect the program in anyways unless the program has mechanisms in place to detect the object and react to it. This is called \emph{listening}, and there are numerous class in \texttt{java.awt.event.*} that is programed to listen to different types of events. For example, \texttt{ActionListener} detects and reacts to general interaction with a widget, \texttt{KeyListener} detacts and reacts to keyboard keys being pressed and released. All listener classes are interfaces containing abstract methods that must be implemented. For example:
+
+    \begin{lstlisting}
+import javax.swing.*;
+import java.awt.event.*;
+
+public class SimpleGui implements ActionListener {
+
+    JFrame frame = new JFrame();
+    JButton button = new JButton(``A Button'');  
+
+    public void actionPerformed(ActionEvent event) {
+        button.setText(``I have been clicked.'');
+    }
+
+    public static void main(String[] args) {
+        SimpleGui gui = new SimpleGui();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(300, 300);
+        frame.getContentPane().add(button);
+        button.addActionListener(this);
+        frame.setVisible(true);
+    }
+}
+    \end{lstlisting}
+
+    The above code creates a window with a button, that when clicked on the text changes from ``A Button'' to ``I have been clicked.'' The code within the \texttt{main()} method can be examined line-by-line:
+
+    \begin{enumerate}
+        \item \texttt{SimpleGui gui = new SimpleGui();} \newline
+        Instantiate a \texttt{SimpleGui} object, which also declare and assign the variables \texttt{frame} and \texttt{button} their respective instance of \texttt{JFrame} and \texttt{JButton}.
+        \item \texttt{frame.setDefaultCloseOperation(JFrame.EXIT\_ON\_CLOSE);} \newline
+        Set \texttt{frame} to exit the program when closed.
+        \item \texttt{frame.setSize(300, 300);} \newline
+        Set \texttt{frame} dimensions to 300 by 300 pixels.
+        \item \texttt{frame.getContentPane().add(button);} \newline
+        Place \texttt{button} on the content pane of \texttt{frame}.
+        \item \texttt{button.addActionListener(this);} \newline
+        Here is the key line of code that acts dynamics to the window. Recall that \texttt{Swing} widgets just as \texttt{JButton} objects are \emph{event} sources, and many different types of events can be generated. In this case, because one is only interested in detecting when the button was clicked on, the program should be able to \emph{listen} for \texttt{ActionEvent} (the type of event object generated when the button was meaningfully interacted upon; ActionEvent object generation is widget dependent.) The corresponding listening is \texttt{ActionListener}. Recall that all listeners are \emph{interfaces}, which contain only abstract methods that must be implemented. The \texttt{button} object is firing \texttt{ActionEvent} objects whenever it is being clicked on, but it doesn't know what \texttt{ActionListening} is receiving the event. There are a number of ways to go about this at this point, but here \texttt{SimpleGui} itself as a class implements the \texttt{ActionListener} interface, which means \texttt{SimpleGui} IS-A \texttt{ActionListener}. 
+        \item \texttt{frame.setVisible(true)} \newline
+        Set \texttt{frame} to be visible.
+    \end{enumerate}
+
+    When \texttt{main()} is running via the JVM, the \texttt{JFrame} object \texttt{frame} is created (technically the \texttt{SimpleGui} object is created first; \texttt{frame} is an instance variable of \texttt{gui}) and displayed, along with all widget objects defined in the method. Aside from the \texttt{main()} method, the class \texttt{SimpleGui} also has another method \texttt{actionPerformed()}. The \texttt{actionPerformed()} method is inherited from the implementation of the \texttt{ActionListener} interface, and because it is an abstract it must be implemented explicitly here. The method \texttt{actionPerformed()} is not called directly in the written code, but rather it is called automatically when an \texttt{ActionEvent} object is received by the \texttt{ActionListener}, which in this case is \texttt{gui}. This has the practical effect of running the code body of \texttt{actionPerformed()} every time \texttt{button} is clicked on. In summary, here is the order and relationship of event source and event listeners:
+
+    \begin{enumerate}
+        \item A class of widget fires event objects based on certain conditions being met. \textit{E.g.} \texttt{JButton} fires \texttt{ActionEvent} if clicked on.
+        \item Implement the appropriate event listener interface to a class. \textit{E.g.} implement \texttt{ActionListener} to \texttt{SimpleGui}.
+        \item Explicitly implement all abstract methods inherited from the listener interface (there may be more than one) within the class where the interface was implemented on. \textit{E.g.} Implement \texttt{actionPerfromed()} within \texttt{SimpleGui}.
+        \item Establish event source and event listener link by calling the appropriate add listener method from the widget (the event source) while passing the event listener as the argument. \textit{E.g.} Calling \texttt{addActionListening()} from \texttt{button} while passing \texttt{gui} as the argument (or, in this case, passing \texttt{this} as the argument because the method call was performed within the cod body of \texttt{gui}.)
+    \end{enumerate}
+
+    \section*{Graphical Widgets in GUI}
+    One of the common ways to add graphical elements to a GUI (such as a \texttt{JFrame}) is to use objects from the \texttt{java.awt.*} package. In \texttt{Swing}, a \texttt{JPanel} is a widget that can be added onto a \texttt{JFrame} that has a high level of flexibility to customize its graphical appearance. This can be achieved by extending a subclass of \texttt{JPanel}, and using graphical objects from \texttt{AWT} to place geometrical shapes, graphical files (.jpg, etc.), or even simple animations. For example:
+
+    \begin{lstlisting}
+import java.awt.*;
+import javax.swing.*;
+
+class MyDrawPanel extends JPanel {
+    
+    public void paintComponent(Graphics g) {
+        g.setColor(Color.orange);
+        g.fillRect(20, 50, 100, 100);
+    }
+}
+    \end{lstlisting}
+
+    The \texttt{paintComponent()} method is inherited from \texttt{JPanel}, and its code body should be overridden --- as it was here --- add the desired graphical element to the \texttt{MyDrawPanel} (A subclass of \texttt{JPanel}. The \texttt{paintComponent} method itself do not need to be called anywhere else; once the \texttt{MyDrawPanel} is initialized and added to the \texttt{JFrame} content pane, the \texttt{paintComponent()} method is called automatically behind the scenes. There is some complexity for the argument of \texttt{paintComponent()}. This method is \texttt{protected}, so the argument it accepts cannot be changed from \texttt{Graphics g}. The class \texttt{Graphics} is an object from \texttt{AWT} that contains many methods for adjusting graphical properties and behavior (such as \texttt{setColor()} and \texttt{fillRect()} in this case.) However, more advanced graphical methods is not available in \texttt{Graphics} but rather in its subclasses, such as \texttt{Graphics2D}. Because the argument declaration of \texttt{paintComponent()} is protected, the argument must be passed as \texttt{Graphics} even if more advanced graphical methods is needed that is unavailable. The solution to this is to cast the \texttt{g} parameter from \texttt{Graphics} class to \texttt{Graphics2D} within the method call itself. For example:
+
+    \begin{lstlisting}
+class MyDrawPanel extends JPanel {
+    
+    public void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        GradientPaint gradient = new GradientPaint(70, 70 Color.blue, 150, 150, Color.orange);
+
+        g2d.setPaint(gradient);
+        g2d.fillOval(70, 70, 100, 100);
+    }
+}
+    \end{lstlisting}
+
+    \section*{Inner Classes}
+    Classes can be nested within a class. These are known as inner class. In the memory heap, there do not existing within each other \textit{per se}, as the relationship between an outer class and an inner class is not the same as that of a superclass and a subclass. A object created as some superclass can be cast into one of its subclass later, but no new object was created; any interaction with the superclass version of the object or the subclass of the object with with the \emph{same} object on the memory heap (they may have different object reference variables, however, which may exist on the heap or on the stack). Any inner class object can only be instantiated \emph{after} an object of its outer class has been instantiated. The inner class object and the outer class object, are \emph{separate} objects that exist on different memory address in the heap. However, the two objects are linked, so that the they can use each other's instance variables. Consider:
+
+    \begin{lstlisting}
+class MyOuter {
+    
+    private int x;
+    MyInner inner = new MyInner();
+
+    class MyInner {
+
+        void go() {
+            x = 42;
+        }
+    }
+
+    public void doStuff() {
+        inner.go();
+    }
+
+}
+    \end{lstlisting}
+
+    The (outer) class \texttt{MyOuter} has a private (it cannot be accessed by anything outside of the class) instance variable \texttt{x}. It also defines an inner class \texttt{MyInner}, that has a method \texttt{go()}. Because \texttt{MyInner} is an inner class of \texttt{MyOuter}, any object instance of \texttt{MyInner} can access instance variables of \texttt{MyOuter}, in this case \texttt{MyInner}'s \texttt{go()} method takes the instance variable of \texttt{MyOutter} and assign the integer \texttt{42} to it. 
+
+\end{document}

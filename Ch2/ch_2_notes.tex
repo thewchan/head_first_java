@@ -1,0 +1,25 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+
+\lstset{language=java, basicstyle={\small\ttfamily}}
+\title{Head First Java: Chapter 2 Notes}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{Object oriented programming (OOP):}
+    \begin{itemize}
+        \item An \emph{object} is made according to a defined \emph{class}. A class is NOT an object, but rather the \textbf{blueprint} for objects.
+        \item A class tells the JVM \emph{how} to create that specific object.
+        \item An object is an \emph{instance} of a class, often saying ``instance'' is just another way of saying ``object''.
+        \item What an object ``knows'', or its ``state'', is called \emph{instance variables.} E.g., an object named ``Alarm'' might have instance variables like ``alarmTime'' and ``alarmMode''.
+        \item What an object ``does'', or its ``behavior'' is called \emph{methods.} For the above Alarm object it might have methods like ``setAlarmTime()'', ``getAlarmTime()'', ``isAlarmset()'', and ``snooze()''.
+        \item It is common for objects to have methods that write or modifies the values of their own instance variables.
+        \item In a Java OO program, global variables or methods/functions are not common, but they can be approximated by marking a method \texttt{public} and \texttt{static} or a variable \texttt{public}, \texttt{static}, and \texttt{final}.
+        \item In each \texttt{.java} file there can only be \textbf{one} public class; if there are multiple public classes they must be contained separately in different \texttt{.java} files. The \texttt{.java} file must be named \textbf{exactly} (including case) as the public class in the file.
+    \end{itemize}
+    
+\end{document}

@@ -1,0 +1,20 @@
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{listings}
+
+\title{Head First Java: Chapter 17 Notes}
+\lstset{language=java, basicstyle={\small\ttfamily}, breaklines=false}
+
+\begin{document}
+
+    \maketitle
+
+    \section*{JAR Files and Pakages}
+    Java contains the ability to organize and package compiled classes into a single executable (providing the end-user has access to a JVM) JAR file. There are some good practice in organizing source code files and class files. First, it is accepted convention to put all classes in a program into a package to avoid name-conflicts. In practice package naming often goes by reverse domain hierarchy. For example, if the user's domain name is \texttt{headfirstjava.com}, then the package would begin with \texttt{com.headfirstjava}. As many levels can be added after that depending on what makes the most sense. On the developments computer, the file structure of the source code files is important. Using the \texttt{com.headfirstjava} structure as an example, and assuming the program name is \texttt{MyProject}, the source code file(s) (that is, the .java files) should be located at \texttt{/MyProject/source/com/headfirstjava}. Then, to compile the .java source code files, the correct file structure can be created by using the commend \texttt{javac -d ../classes com/headfirstjava/*.java} while situated in \texttt{/MyProject/source/}. If compilation is successful, all class files (including inner classes) would be located in \texttt{/MyProject/classes/com/headfirstjava/}.
+
+    The source code all related .java files shoudl begin (before any \texttt{import} statements) with \texttt{package com.headfirstjava;} which will ensure that all resulting class files (and later jar files) know they are in the same package. A \texttt{manifext.txt} file should be created and placed into \texttt{/MyProject/classes/}, with one single line: ``\texttt{Main-Class: com.headfirstjava.MyProjectMain}'' (where \texttt{MyProjectMain} is the program name; the class where the \texttt{main()} method is located at.) Then, the jar file can be created by the commend line command \texttt{jar -cvmf manifest.txt MyProject.jar com} (the name of the .jar file can be anything) while located in the directory containing the \texttt{manifest.txt} file. 
+
+    The jar file is handy to project source code from end-user, and also deploy without having to handle many different files. Note that the web deployment framework described in this chapter, Java Web Start has been discontinued since Java 11.
+\end{document}
